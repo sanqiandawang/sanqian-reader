@@ -1,10 +1,7 @@
 from providers.base import ContentProvider, ProviderMetadata
 
 # These imports will work once the corresponding modules are created (Tasks 7-9)
-try:
-    from providers.jina import JinaProvider
-except ImportError:
-    pass
+from providers.jina import JinaProvider
 
 try:
     from providers.readability_provider import ReadabilityProvider
