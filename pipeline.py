@@ -643,7 +643,19 @@ def _generate_cover(articles: list) -> Optional[str]:
         draw.text((300, 60), "三千要看", fill=(0, 0, 0), font=font_title, anchor="mt")
         draw.text((300, 110), TODAY, fill=(128, 128, 128), font=font_body, anchor="mt")
 
-        y = 200
+        # Cat ASCII art
+        cat_lines = [
+            "      ／l、",
+            "    （ﾟ､ ｡ ７",
+            "      l  ~ヽ",
+            "      じしf_,)ノ",
+        ]
+        cat_y = 160
+        for line in cat_lines:
+            draw.text((300, cat_y), line, fill=(180, 180, 180), font=font_body, anchor="mt")
+            cat_y += 28
+
+        y = 290
         for a in articles[:10]:
             title = a.get("title_en", "Untitled")[:25]
             draw.text((50, y), f"· {title}", fill=(0, 0, 0), font=font_body)

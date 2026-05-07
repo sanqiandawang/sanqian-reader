@@ -28,10 +28,15 @@ def send_epub(epub_path, max_retries=3):
             filename = epub_path.split("/")[-1]
             attachment.add_header("Content-Disposition", f'attachment; filename="{filename}"')
             msg.attach(attachment)
-            with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=30) as server:
-                server.starttls()
-                server.login(SMTP_USER, SMTP_PASS)
-                server.sendmail(SMTP_USER, KINDLE_EMAIL, msg.as_string())
+            if SMTP_PORT == 465:
+                with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT, timeout=30) as server:
+                    server.login(SMTP_USER, SMTP_PASS)
+                    server.sendmail(SMTP_USER, KINDLE_EMAIL, msg.as_string())
+            else:
+                with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=30) as server:
+                    server.starttls()
+                    server.login(SMTP_USER, SMTP_PASS)
+                    server.sendmail(SMTP_USER, KINDLE_EMAIL, msg.as_string())
             logger.info(f"Sent {filename} to {KINDLE_EMAIL}")
             return True
         except smtplib.SMTPAuthenticationError:

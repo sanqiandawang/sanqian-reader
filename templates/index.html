@@ -17,6 +17,7 @@ h1{text-align:center;font-size:1.6em;margin-bottom:.2em}
 .article-item .summary{color:#555;font-size:.9em;margin-top:.4em;line-height:1.5}
 .footer{text-align:center;margin-top:2em;font-size:.85em}
 .footer a{color:#888}
+.cat-art{text-align:center;color:#bbb;font-size:.7em;line-height:1.3;margin:1em 0}
 </style>
 </head>
 <body>
@@ -24,6 +25,13 @@ h1{text-align:center;font-size:1.6em;margin-bottom:.2em}
 {% if issue %}
 <h1>三千要看</h1>
 <div class="date">{{ today }}</div>
+
+<pre class="cat-art">
+      ／l、
+    （ﾟ､ ｡ ７
+      l  ~ヽ
+      じしf_,)ノ
+</pre>
 
 <div class="editor-note">
 {{ issue.editor_note | e }}
@@ -47,7 +55,15 @@ h1{text-align:center;font-size:1.6em;margin-bottom:.2em}
 {% else %}
 <h1>三千要看</h1>
 <div class="date">{{ today }}</div>
-<p style="text-align:center;color:#888;margin-top:3em">今天还没有内容，稍后回来看看。</p>
+
+<pre class="cat-art">
+      ／l、
+    （ﾟ､ ｡ ７
+      l  ~ヽ
+      じしf_,)ノ
+</pre>
+
+<p style="text-align:center;color:#888;margin-top:2em">今天还没有内容，稍后回来看看。</p>
 {% endif %}
 
 <div class="footer">
