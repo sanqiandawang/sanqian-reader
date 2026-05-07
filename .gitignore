@@ -1,0 +1,12 @@
+venv/
+.env
+__pycache__/
+*.pyc
+data/index.db
+data/articles/
+data/issues/
+data/cache/
+data/daily.log
+data/usage.jsonl
+data/failed_urls.jsonl
+output/
