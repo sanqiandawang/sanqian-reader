@@ -1,0 +1,23 @@
+sources:
+  - { name: "Aeon", domain: "thought", weight: 5, rss: "https://aeon.co/feed.rss" }
+  - { name: "The Atlantic", domain: "thought", weight: 5, rss: "https://feeds.feedburner.com/TheAtlantic" }
+  - { name: "The New Yorker", domain: "thought", weight: 4, rss: "https://www.newyorker.com/feed/everything" }
+  - { name: "The Guardian Long Read", domain: "thought", weight: 4, rss: "https://www.theguardian.com/news/series/the-long-read/rss" }
+  - { name: "Longreads", domain: "thought", weight: 3, rss: "https://longreads.com/feed/" }
+  - { name: "Nautilus", domain: "science", weight: 3, rss: "https://nautil.us/feed/" }
+  - { name: "Quanta Magazine", domain: "science", weight: 3, rss: "https://www.quantamagazine.org/feed/" }
+  - { name: "Anime News Network", domain: "gaming_anime", weight: 3, rss: "https://www.animenewsnetwork.com/all/rss.xml" }
+  - { name: "Kotaku", domain: "gaming_anime", weight: 3, rss: "https://kotaku.com/rss" }
+  - { name: "Polygon", domain: "gaming_anime", weight: 3, rss: "https://www.polygon.com/rss/index.xml" }
+  - { name: "Rock Paper Shotgun", domain: "gaming_anime", weight: 2, rss: "https://www.rockpapershotgun.com/feed/" }
+
+domains:
+  thought:
+    min_articles: 2
+    max_articles: 5
+  science:
+    min_articles: 1
+    max_articles: 2
+  gaming_anime:
+    min_articles: 1
+    max_articles: 3
