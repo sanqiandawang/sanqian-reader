@@ -1,0 +1,42 @@
+name: Daily Pipeline
+
+on:
+  schedule:
+    - cron: "0 22 * * *"  # 6:00 CST
+  workflow_dispatch:  # Manual trigger from GitHub UI
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run pipeline
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          DEEPSEEK_MODEL: deepseek-chat
+          SMTP_HOST: smtp.126.com
+          SMTP_PORT: "465"
+          SMTP_USER: z3647512@126.com
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          KINDLE_EMAIL: zhuaipi888@kindle.com
+          REFRESH_TOKEN: sanqian2026
+        run: python pipeline.py
+
+      - name: Build static site
+        run: python build_static.py
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+          publish_branch: gh-pages
+          force_orphan: true
