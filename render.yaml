@@ -1,0 +1,37 @@
+services:
+  - type: web
+    name: sanqian-reader
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: mkdir -p data/articles data/issues data/cache output && uvicorn server:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: DEEPSEEK_MODEL
+        value: deepseek-chat
+      - key: SMTP_HOST
+        value: smtp.126.com
+      - key: SMTP_PORT
+        value: "465"
+      - key: SMTP_USER
+        value: z3647512@126.com
+      - key: SMTP_PASS
+        sync: false
+      - key: KINDLE_EMAIL
+        value: zhuaipi888@kindle.com
+      - key: REFRESH_TOKEN
+        sync: false
+      - key: SERVER_PORT
+        value: "8765"
+
+  - type: cron
+    name: sanqian-pipeline
+    env: python
+    plan: free
+    schedule: "0 22 * * *"
+    buildCommand: pip install -r requirements.txt
+    startCommand: curl -s "https://sanqian-reader.onrender.com/refresh?token=$REFRESH_TOKEN"
+    envVars:
+      - key: REFRESH_TOKEN
+        sync: false
