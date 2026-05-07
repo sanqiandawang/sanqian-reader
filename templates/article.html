@@ -27,11 +27,7 @@ body{max-width:720px;margin:0 auto;padding:24px 18px;background:#fff;color:#000;
 </div>
 
 <div class="content">
-{% for p in page_content.split('\n') %}
-{% if p.strip() %}
-<p>{{ p.strip() | e }}</p>
-{% endif %}
-{% endfor %}
+{{ page_content | safe }}
 </div>
 
 <div class="pagination">
