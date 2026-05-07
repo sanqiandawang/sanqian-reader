@@ -18,8 +18,8 @@ def send_epub(epub_path, max_retries=3):
             msg = MIMEMultipart()
             msg["From"] = SMTP_USER
             msg["To"] = KINDLE_EMAIL
-            msg["Subject"] = "三千读库"
-            body = f"三千读库 — {datetime.now().strftime('%Y-%m-%d')}\n\n附件为今日 EPUB。"
+            msg["Subject"] = "三千要看"
+            body = f"三千要看 — {datetime.now().strftime('%Y-%m-%d')}\n\n附件为今日 EPUB。"
             msg.attach(MIMEText(body, "plain", "utf-8"))
             with open(epub_path, "rb") as f:
                 attachment = MIMEBase("application", "octet-stream")
