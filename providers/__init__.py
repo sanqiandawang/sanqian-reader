@@ -5,7 +5,4 @@ from providers.jina import JinaProvider
 
 from providers.readability_provider import ReadabilityProvider
 
-try:
-    from providers.rss_feed import fetch_rss_feeds
-except ImportError:
-    pass
+from providers.rss_feed import fetch_rss_feeds
