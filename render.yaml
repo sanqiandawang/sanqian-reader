@@ -22,13 +22,10 @@ services:
         value: zhuaipi888@kindle.com
       - key: REFRESH_TOKEN
         sync: false
-      - key: SERVER_PORT
-        value: "8765"
 
   - type: cron
     name: sanqian-pipeline
     env: python
-    plan: free
     schedule: "0 22 * * *"
     buildCommand: pip install -r requirements.txt
     startCommand: curl -s "https://sanqian-reader.onrender.com/refresh?token=$REFRESH_TOKEN"
