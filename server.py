@@ -71,7 +71,15 @@ async def article_view(article_id: str, page: int = Query(1, ge=1)):
     if not article:
         return HTMLResponse("<h1>Article not found</h1>", status_code=404)
 
+    # Load full content from JSON cold storage if not in SQLite
     content = article.get("content_zh", "")
+    if not content:
+        json_path = Path(__file__).parent / "data" / "articles" / f"{article_id}.json"
+        if json_path.exists():
+            import json
+            full = json.loads(json_path.read_text())
+            content = full.get("content_zh", "")
+            article["content_zh"] = content
     pages = paginate_content(content)
     total_pages = len(pages) or 1
     page = min(page, total_pages)
