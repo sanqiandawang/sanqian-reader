@@ -1,0 +1,12 @@
+/* E-ink compatible base */
+body {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 18px;
+  background: #fff;
+  color: #000;
+  font-size: 18px;
+  line-height: 1.8;
+  font-family: serif;
+}
+a { color: #000; }

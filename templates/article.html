@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ article.title_zh or article.id }} — 三千要看</title>
+<style>
+body{max-width:720px;margin:0 auto;padding:24px 18px;background:#fff;color:#000;font-size:18px;line-height:1.8;font-family:serif}
+.article-header{margin-bottom:1.5em;border-bottom:1px solid #ccc;padding-bottom:.8em}
+.article-header h1{font-size:1.4em;margin-bottom:.2em}
+.article-header .meta{color:#888;font-size:.85em}
+.content p{text-indent:2em;margin:.4em 0}
+.pagination{margin:2em 0;text-align:center;font-size:.95em}
+.pagination a{padding:.3em .8em;text-decoration:none;color:#000;border:1px solid #ccc}
+.pagination span{padding:.3em .8em;color:#888}
+.nav-bottom{margin-top:2em;padding-top:1em;border-top:1px solid #eee;text-align:center;font-size:.95em}
+.nav-bottom a{text-decoration:none;color:#000;padding:.3em .8em;border:1px solid #ccc}
+.done-link{color:#888;font-size:.85em}
+</style>
+</head>
+<body>
+
+<div class="article-header">
+  <h1>{{ article.title_zh or article.id }}</h1>
+  <div class="meta">{{ article.source }} | {{ article.word_count_zh }} 字</div>
+</div>
+
+<div class="content">
+{% for p in page_content.split('\n') %}
+{% if p.strip() %}
+<p>{{ p.strip() | e }}</p>
+{% endif %}
+{% endfor %}
+</div>
+
+<div class="pagination">
+{% if page > 1 %}
+<a href="/article/{{ article.id }}?page={{ page - 1 }}">上一页</a>
+{% endif %}
+<span>第 {{ page }} / {{ total_pages }} 页</span>
+{% if page < total_pages %}
+<a href="/article/{{ article.id }}?page={{ page + 1 }}">下一页</a>
+{% endif %}
+</div>
+
+<div class="nav-bottom">
+<a href="/">回首页</a>
+{% if is_last %}
+| <a class="done-link" href="/article/{{ article.id }}?page={{ page }}">已读完 ✓</a>
+{% endif %}
+</div>
+
+</body>
+</html>

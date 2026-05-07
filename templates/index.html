@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>三千要看 — {{ today }}</title>
+<style>
+body{max-width:720px;margin:0 auto;padding:24px 18px;background:#fff;color:#000;font-size:18px;line-height:1.6;font-family:serif}
+h1{text-align:center;font-size:1.6em;margin-bottom:.2em}
+.date{text-align:center;color:#888;font-size:.9em;margin-bottom:1.5em}
+.editor-note{border-left:3px solid #333;padding:.8em 1.2em;margin:1.5em 0;background:#fafafa;font-size:.95em;line-height:1.7}
+.article-list{list-style:none;padding:0}
+.article-item{padding:1em 0;border-bottom:1px solid #eee}
+.article-item a{text-decoration:none;color:#000}
+.article-item .title{font-size:1.1em;font-weight:bold;display:block}
+.article-item .meta{color:#888;font-size:.85em;margin-top:.3em}
+.article-item .summary{color:#555;font-size:.9em;margin-top:.4em;line-height:1.5}
+.footer{text-align:center;margin-top:2em;font-size:.85em}
+.footer a{color:#888}
+</style>
+</head>
+<body>
+
+{% if issue %}
+<h1>三千要看</h1>
+<div class="date">{{ today }}</div>
+
+<div class="editor-note">
+{{ issue.editor_note | e }}
+</div>
+
+{% if issue.stats.get('fallback_note') %}
+<p style="color:#c00;text-align:center">{{ issue.stats.fallback_note }}</p>
+{% endif %}
+
+<ul class="article-list">
+{% for a in articles %}
+<li class="article-item">
+  <a href="/article/{{ a.id }}">
+    <span class="title">{{ a.title_zh or a.id }}</span>
+    <span class="meta">{{ a.source }} | {{ a.word_count_zh }} 字</span>
+    <span class="summary">{{ a.summary_zh }}</span>
+  </a>
+</li>
+{% endfor %}
+</ul>
+{% else %}
+<h1>三千要看</h1>
+<div class="date">{{ today }}</div>
+<p style="text-align:center;color:#888;margin-top:3em">今天还没有内容，稍后回来看看。</p>
+{% endif %}
+
+<div class="footer">
+  <a href="/archive">往期</a>
+</div>
+
+</body>
+</html>

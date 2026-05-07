@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>往期 — 三千要看</title>
+<style>
+body{max-width:720px;margin:0 auto;padding:24px 18px;background:#fff;color:#000;font-size:18px;line-height:1.6;font-family:serif}
+h1{text-align:center;font-size:1.4em;margin-bottom:1.5em}
+.issue{margin-bottom:2em}
+.issue-date{font-size:1.1em;font-weight:bold;border-bottom:1px solid #ccc;padding-bottom:.3em;margin-bottom:.5em}
+.issue-note{color:#555;font-size:.9em;margin-bottom:.5em;line-height:1.5}
+.issue a{text-decoration:none;color:#000}
+.issue ul{list-style:none;padding:0;margin:0}
+.issue li{padding:.2em 0;font-size:.95em}
+.pagination{margin:2em 0;text-align:center}
+.pagination a{padding:.3em .8em;text-decoration:none;color:#000;border:1px solid #ccc}
+.footer{text-align:center;margin-top:2em}
+.footer a{color:#888;text-decoration:none}
+</style>
+</head>
+<body>
+
+<h1>往期</h1>
+
+{% for issue in issues %}
+<div class="issue">
+  <div class="issue-date">{{ issue.date }}</div>
+  <div class="issue-note">
+    {% if issue.editor_note | length > 120 %}
+      {{ issue.editor_note[:120] | e }}...
+    {% else %}
+      {{ issue.editor_note | e }}
+    {% endif %}
+  </div>
+  <ul>
+  {% for aid in issue.articles %}
+    <li><a href="/article/{{ aid }}">{{ aid }}</a></li>
+  {% endfor %}
+  </ul>
+</div>
+{% endfor %}
+
+{% if not issues %}
+<p style="text-align:center;color:#888">还没有往期内容。</p>
+{% endif %}
+
+<div class="pagination">
+{% if page > 1 %}
+<a href="/archive?page={{ page - 1 }}">上一页</a>
+{% endif %}
+</div>
+
+<div class="footer">
+  <a href="/">回首页</a>
+</div>
+
+</body>
+</html>
