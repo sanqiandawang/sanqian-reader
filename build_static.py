@@ -11,93 +11,60 @@ SITE = ROOT / "site"
 DATA = ROOT / "data"
 BASE = "/sanqian-reader"
 
-CSS = """*{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#f8f8f6;--card:#fff;--text:#222;--muted:#777;--faint:#aaa;--border:#e6e6e2;--accent:#111}
-body{max-width:720px;margin:0 auto;padding:48px 24px 72px;background:var(--bg);color:var(--text);font-size:17px;line-height:1.7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
-@media(max-width:600px){body{padding:28px 14px 48px;font-size:16px}}
-
-.masthead{text-align:center;margin-bottom:40px}
-.masthead h1{font-size:2em;font-weight:700;letter-spacing:-.02em;margin-bottom:4px;color:var(--accent)}
-.masthead .date{font-size:.82em;color:var(--faint);text-transform:uppercase;letter-spacing:.1em}
-@media(max-width:600px){.masthead h1{font-size:1.6em}.masthead{margin-bottom:32px}}
-
-.cat-art{text-align:center;color:var(--border);font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:.55em;line-height:1.15;margin:0 0 28px;white-space:pre}
-@media(max-width:600px){.cat-art{font-size:.48em;margin-bottom:24px}}
-
-.editor-note{max-width:560px;margin:0 auto 40px;padding:20px 24px;background:var(--card);border:1px solid var(--border);font-size:.9em;line-height:1.75;color:var(--muted)}
-@media(max-width:600px){.editor-note{margin-bottom:32px;padding:16px 18px}}
-
-.section-card{margin:0 0 32px;padding:28px;background:var(--card);border:1px solid var(--border)}
-.section-card h2{font-size:.85em;font-weight:600;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border)}
-.section-card .article-item{margin-bottom:0}
-.section-card .article-item a{display:block;text-decoration:none;color:var(--text);padding:0}
-.section-card .title{font-size:1.1em;font-weight:600;line-height:1.45;display:block;margin-bottom:4px;color:var(--accent)}
-.section-card .meta{font-size:.78em;color:var(--faint);display:block;margin-bottom:6px}
-.section-card .summary{font-size:.9em;color:var(--muted);line-height:1.6;display:block}
-@media(max-width:600px){.section-card{margin-bottom:24px;padding:20px 16px}.section-card .title{font-size:1em}}
-
-.article-header{text-align:center;margin-bottom:36px;padding-bottom:24px;border-bottom:1px solid var(--border)}
-.article-header h1{font-size:1.6em;font-weight:700;line-height:1.35;margin-bottom:8px;color:var(--accent)}
-.article-header .meta{font-size:.82em;color:var(--faint);letter-spacing:.04em}
-@media(max-width:600px){.article-header h1{font-size:1.3em}}
-
-.content{line-height:1.85}
-.content p{margin:0 0 1em;text-indent:2em}
-.content h2{font-size:1.2em;font-weight:700;margin:2em 0 .5em;color:var(--accent)}
-.content h3{font-size:1.05em;font-weight:700;margin:1.5em 0 .5em;color:var(--text)}
-.content blockquote{margin:1.2em 0;padding:.6em 1em;border-left:3px solid var(--border);color:var(--muted)}
-.content ul,.content ol{margin:1em 0;padding-left:1.5em}
-.content li{margin:.3em 0}
-.content hr{border:none;text-align:center;margin:2em 0}
-.content hr::after{content:"· · ·";color:var(--border);font-size:1.2em}
-.content strong{font-weight:700}
-.content a{color:#336;text-decoration:underline;text-underline-offset:2px}
-.content code{font-size:.88em;background:#f0f0ec;padding:1px 6px}
-@media(max-width:600px){.content{font-size:.98em}.content p{text-indent:1.5em}}
-
-.pagination{display:flex;justify-content:center;align-items:center;gap:12px;margin:40px 0 28px;font-size:.9em}
-.pagination a{text-decoration:none;color:var(--text);padding:6px 16px;border:1px solid var(--border);background:var(--card)}
-.pagination a:hover{border-color:var(--accent)}
-.pagination span{color:var(--faint)}
-
-.nav-bottom{text-align:center;margin-top:36px;padding-top:24px;border-top:1px solid var(--border);font-size:.88em}
-.nav-bottom a{text-decoration:none;color:var(--muted);padding:6px 14px}
-.nav-bottom a:hover{color:var(--accent)}
-
-.spoiler-tag{display:inline-block;padding:1px 6px;border:1px solid #c44;color:#c44;font-size:.78em;margin-left:6px}
-
-.briefing{margin:0 auto 40px;max-width:560px;padding:24px 28px;background:var(--card);border:1px solid var(--border)}
-.briefing h2{font-size:.85em;font-weight:600;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;margin-bottom:18px}
-.briefing ol{list-style:none;padding:0;counter-reset:br}
-.briefing li{counter-increment:br;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)}
-.briefing li:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
-.briefing h3{font-size:.95em;font-weight:600;line-height:1.45;margin:0 0 4px}
-.briefing h3 a{color:var(--accent);text-decoration:none}
-.briefing p{font-size:.88em;color:var(--muted);line-height:1.6;margin:0}
-.briefing small{font-size:.75em;color:var(--faint)}
-@media(max-width:600px){.briefing{padding:18px 16px;margin-bottom:32px}}
-
-.issue{margin-bottom:32px}
-.issue-date{font-size:1em;font-weight:600;color:var(--accent);margin-bottom:4px}
-.issue-note{font-size:.85em;color:var(--muted);margin-bottom:8px;line-height:1.6}
-.issue ul{list-style:none;padding:0}
-.issue li{padding:3px 0;font-size:.9em}
-.issue a{color:var(--text);text-decoration:none}
-
-.footer{text-align:center;margin-top:48px;padding-top:20px;border-top:1px solid var(--border);font-size:.78em}
-.footer a{color:var(--faint);text-decoration:none;letter-spacing:.06em}
-
-.cat-footer{text-align:center;color:var(--border);font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:.45em;line-height:1.15;margin:48px 0 8px;white-space:pre}
-.push-container{margin:0 auto 40px;max-width:360px;text-align:center}
-.cat-btn{width:100%;background:var(--card);border:1px solid var(--border);padding:18px 24px;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:8px}
-.cat-btn .cat-art{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:.55em;line-height:1.1;margin:0;white-space:pre;color:var(--accent)}
-.cat-btn .cat-label{font-size:.88em;font-weight:600;color:var(--accent);letter-spacing:.02em}
-.cat-btn:hover:not(:disabled){border-color:var(--accent);background:var(--accent)}
+CSS = """body{max-width:720px;margin:0 auto;padding:24px 18px;background:#fff;color:#000;font-size:18px;line-height:1.6;font-family:serif}
+h1{text-align:center;font-size:1.6em;margin-bottom:.2em}
+.date{text-align:center;color:#888;font-size:.9em;margin-bottom:1.5em}
+.editor-note{border-left:3px solid #333;padding:.8em 1.2em;margin:1.5em 0;background:#fafafa;font-size:.95em;line-height:1.7}
+.article-list{list-style:none;padding:0}
+.article-item{padding:1em 0;border-bottom:1px solid #eee}
+.article-item a{text-decoration:none;color:#000}
+.article-item .title{font-size:1.1em;font-weight:bold;display:block}
+.article-item .meta{color:#888;font-size:.85em;margin-top:.3em}
+.article-item .summary{color:#555;font-size:.9em;margin-top:.4em;line-height:1.5}
+.footer{text-align:center;margin-top:2em;font-size:.85em}
+.footer a{color:#888}
+.cat-art{text-align:center;color:#bbb;font-size:.7em;line-height:1.3;margin:1em 0;white-space:pre}
+.content{line-height:1.8}
+.content p{text-indent:2em;margin:.4em 0}
+.content h2,.content h3{margin:1.2em 0 .4em}
+.content blockquote{border-left:3px solid #ccc;padding:.3em 1em;margin:.5em 0;color:#555}
+.article-header{margin-bottom:1.5em;border-bottom:1px solid #ccc;padding-bottom:.8em}
+.article-header h1{font-size:1.4em;margin-bottom:.2em}
+.article-header .meta{color:#888;font-size:.85em}
+.pagination{margin:2em 0;text-align:center;font-size:.95em}
+.pagination a{padding:.3em .8em;text-decoration:none;color:#000;border:1px solid #ccc}
+.pagination span{padding:.3em .8em;color:#888}
+.nav-bottom{margin-top:2em;padding-top:1em;border-top:1px solid #eee;text-align:center;font-size:.95em}
+.nav-bottom a{text-decoration:none;color:#000;padding:.3em .8em;border:1px solid #ccc}
+.done-link{color:#888;font-size:.85em}
+.cat-footer{text-align:center;color:#ddd;font-size:.55em;line-height:1.2;margin:3em 0 1em;white-space:pre}
+.issue{margin-bottom:2em}
+.issue-date{font-size:1.1em;font-weight:bold;border-bottom:1px solid #ccc;padding-bottom:.3em;margin-bottom:.5em}
+.issue-note{color:#555;font-size:.9em;margin-bottom:.5em;line-height:1.5}
+.issue a{text-decoration:none;color:#000}
+.issue ul{list-style:none;padding:0;margin:0}
+.issue li{padding:.2em 0;font-size:.95em}
+.section-card{margin:1.5em 0;padding:1em;border:1px solid #ddd}
+.section-card h2{font-size:1.1em;margin:0 0 .8em 0;padding-bottom:.4em;border-bottom:1px solid #eee}
+.section-card .article-item:last-child{border-bottom:none}
+.spoiler-tag{display:inline-block;padding:0 .4em;border:1px solid #c00;color:#c00;font-size:.85em;margin-left:.5em}
+.briefing{margin-bottom:2em;padding:1em;border:1px solid #000}
+.briefing h2{margin-top:0}
+.briefing ol{padding-left:1.5em}
+.briefing li{margin-bottom:1em}
+.briefing h3{font-size:1em;margin:0 0 .3em 0}
+.briefing p{margin:.3em 0;line-height:1.6}
+.briefing small{color:#666}
+.push-container{margin:2rem 0;text-align:center}
+.cat-btn{background:#fff;border:1.5px solid #1a1a1a;padding:1rem 2rem;cursor:pointer;font-family:inherit;display:inline-flex;flex-direction:column;align-items:center;gap:.5rem}
+.cat-btn .cat-art{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:.7rem;line-height:1.1;margin:0;white-space:pre}
+.cat-btn .cat-label{font-size:.9rem;letter-spacing:.05em}
+.cat-btn:hover:not(:disabled){background:#1a1a1a;color:#fff}
 .cat-btn:hover:not(:disabled) .cat-art,.cat-btn:hover:not(:disabled) .cat-label{color:#fff}
-.cat-btn:disabled{opacity:.4}
-#push-status{margin-top:12px;font-size:.82em;color:var(--muted);line-height:1.5}
+.cat-btn:disabled{opacity:.5;cursor:not-allowed}
+#push-status{margin-top:1rem;font-size:.85rem;color:#666;line-height:1.5}
 #push-status a{color:#336}
-.push-hint{font-size:.7em;color:var(--faint);margin-top:8px;line-height:1.5}"""
+.push-hint{font-size:.72rem;color:#bbb;margin-top:.5rem;line-height:1.5}"""
 
 CAT_ART = """      ／l、
     （ﾟ､ ｡ ７
@@ -232,7 +199,7 @@ def build():
 def build_index(issue, today_str, section_meta):
     if not issue:
         return f"""<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>三千要看</title><style>{CSS}</style></head><body>
-<div class="masthead"><h1>三千要看</h1><div class="date">{today_str}</div></div>
+<h1>三千要看</h1><div class="date">{today_str}</div>
 <p style="text-align:center;color:#999;margin-top:2em">今天还没有内容，一会回来看看。</p>
 <div class="footer"><a href="{BASE}/archive.html">往期</a></div>
 </body></html>"""
@@ -295,7 +262,7 @@ def build_index(issue, today_str, section_meta):
             pass
 
     return f"""<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>三千要看 - {issue["_date"]}</title><style>{CSS}</style></head><body>
-<div class="masthead"><h1>三千要看</h1><div class="date">{issue["_date"]}</div></div>
+<h1>三千要看</h1><div class="date">{issue["_date"]}</div>
 {briefing_html}
 <div class="push-container">
   <button id="push-btn" class="cat-btn" onclick="triggerPush()">
