@@ -324,6 +324,9 @@ def step_translate(selected: list) -> list:
             c = futures[future]
             try:
                 zh_text, usage = future.result()
+                # Rate-limit delay for cloud APIs
+                if MAX_CONCURRENCY == 1:
+                    time.sleep(5)
                 if zh_text:
                     word_count_zh = len(zh_text.replace(" ", "").replace("\n", ""))
                     c["content_zh"] = zh_text

@@ -138,7 +138,7 @@ def call_ai(prompt: str, system: str = "You are a helpful assistant.", max_token
     try:
         if _provider == "gemini":
             from google import genai
-            model = "gemini-2.5-flash"
+            model = "gemini-2.0-flash"  # 15 RPM free tier vs 5 RPM for 2.5
             response = _client.models.generate_content(
                 model=model,
                 contents=prompt,

@@ -28,6 +28,7 @@ jobs:
       - name: Run pipeline
         env:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          MAX_CONCURRENCY: 1
           SMTP_HOST: smtp.126.com
           SMTP_PORT: "465"
           SMTP_USER: z3647512@126.com
