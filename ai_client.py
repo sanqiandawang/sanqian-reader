@@ -104,7 +104,7 @@ def _init_client():
     deepseek_key = os.getenv("DEEPSEEK_API_KEY", "")
     if deepseek_key:
         from config import DEEPSEEK_BASE_URL
-        _client = {"api_key": deepseek_key, "base_url": DEEPSEEK_BASE_URL.rstrip("/")}
+        _client = {"api_key": deepseek_key.strip(), "base_url": DEEPSEEK_BASE_URL.rstrip("/")}
         _provider = "deepseek"
         logger.info("AI: Using DeepSeek (raw requests)")
         return
