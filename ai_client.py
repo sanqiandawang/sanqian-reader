@@ -41,7 +41,7 @@ SPOILER_CHECK_PROMPT = """以下是一篇影评的中文译文。判断它是否
 译文：
 {translated_text}"""
 
-TRANSLATION_PROMPT_VERSION = "v3"
+TRANSLATION_PROMPT_VERSION = "v2"
 
 TRANSLATION_SYSTEM = """You are a professional translator. Translate the following English article into Chinese.
 
@@ -52,12 +52,7 @@ Requirements:
 4. Never omit: translate every paragraph fully, do not summarize or skip content
 5. Preserve paragraph structure from the original
 6. Output ONLY the Chinese translation, no commentary, no notes at the beginning or end
-
-**Chinese writing style (critical):**
-- Minimize the use of 的. Aim for no more than 2-3 instances per paragraph. Restructure sentences to avoid it naturally.
-- Break long English sentences into shorter, punchier Chinese sentences. If an English sentence has 3+ clauses, split it into 2-3 Chinese sentences.
-- Convert English passive voice ("was discovered", "had been taken") to Chinese active voice. Use "有人发现", "他们拿走", not "被发现", "被带走".
-- Prefer short, rhythmic prose over long, academic sentences. Chinese reads best when sentences are 15-30 characters."""
+7. Strip image captions, figure descriptions, photo credits, and alt-text from the output. Remove lines like "Image:", "Photo:", "Figure X:", "[Image of...", "Credit:", "©" that describe images rather than article content."""
 
 REVIEW_PROMPT = """Evaluate the translation quality of the following Chinese text against the original English excerpt.
 
