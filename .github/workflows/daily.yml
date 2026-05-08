@@ -28,6 +28,11 @@ jobs:
       - name: Test DeepSeek connectivity
         run: |
           curl -s -w "\nHTTP %{http_code}" https://api.deepseek.com/v1/models -H "Authorization: Bearer ${{ secrets.DEEPSEEK_API_KEY }}" | tail -3
+          python -c "
+          import requests
+          r = requests.get('https://api.deepseek.com/v1/models', headers={'Authorization': 'Bearer ${{ secrets.DEEPSEEK_API_KEY }}'}, timeout=10)
+          print(f'Python requests: HTTP {r.status_code}')
+          "
 
       - name: Run pipeline
         env:
