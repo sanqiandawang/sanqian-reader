@@ -148,7 +148,6 @@ def call_ai(prompt: str, system: str = "You are a helpful assistant.", max_token
                 "Content-Type": "application/json",
             },
             json=body,
-            },
             timeout=120,
         )
         resp.raise_for_status()
