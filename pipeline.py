@@ -35,17 +35,27 @@ TODAY = date.today().isoformat()
 
 
 def clean_translated_content(text: str) -> str:
-    """Post-process translated content: strip tracking params, escape underscores, convert links to footnotes."""
+    """Post-process translated content: strip tracking params, trim tail junk, footnotes."""
     import re
-    # 1. Strip utm_*, fbclid, ref, source tracking params from URLs
+    # 1. Trim tail junk: 'Subscribe / Read more / Related / More from' patterns
+    tail_patterns = [
+        r'\n{2,}(Subscribe|订阅|Read More|Read next|Related|More from|Follow|Share this|Support our|Newsletter|Sign up|© \d{4}).*',
+        r'\n{2,}(---|\*\*\*)\s*\n.{0,200}(subscribe|newsletter|follow us|share|support).*',
+    ]
+    for pattern in tail_patterns:
+        m = re.search(pattern, text, re.IGNORECASE | re.DOTALL)
+        if m:
+            text = text[:m.start()].rstrip()
+            break
+    # 2. Strip utm_*, fbclid, ref, source tracking params from URLs
     text = re.sub(r'[?&](utm_[^&\s]+|fbclid=[^&\s]+|ref=[^&\s]+|source=[^&\s]+)', '', text)
-    # 2. Escape underscores in URLs to prevent markdown italic
+    # 3. Escape underscores in URLs to prevent markdown italic
     def escape_url_underscores(m):
         url = m.group(1)
         escaped = url.replace("_", "\\_")
         return f'({escaped})'
     text = re.sub(r'\(([^)]*_[^)]*)\)', escape_url_underscores, text)
-    # 3. Convert [text](url) to footnotes
+    # 4. Convert [text](url) to footnotes
     footnotes = []
     def link_to_footnote(m):
         link_text = m.group(1)
@@ -281,23 +291,45 @@ def step_curate(passed: list) -> list:
 
     selected = []
     used_ids = set()
-    section_results = {}  # {section_id: candidate}
+    section_results = {}
+    cross_borrow_notes = []
 
+    # --- Wildcard FIRST (broader pool, ensures at least 1 pick) ---
+    wildcard_cfg = sections.pop("wildcard", None)
+    if wildcard_cfg:
+        wildcard_pool = passed[:]  # ALL candidates eligible
+        if len(wildcard_pool) > 8:
+            random.shuffle(wildcard_pool)
+            wildcard_pool = wildcard_pool[:8]
+        logger.info(f"  [wildcard] {wildcard_cfg['emoji']}{wildcard_cfg['name']}: {len(wildcard_pool)} in pool")
+        result = pick_for_section(wildcard_cfg, wildcard_pool)
+        if result:
+            result["section_id"] = "wildcard"
+            selected.append(result)
+            used_ids.add(result["id"])
+            section_results["wildcard"] = result
+            logger.info(f"    -> {result['title_en'][:50]}")
+
+    # --- Other sections with cross-borrowing ---
     for section_id, cfg in sections.items():
-        if section_id == "wildcard":
-            continue  # Do wildcard last
-
         eligible = [
             c for c in passed
             if c.get("source_id") in cfg.get("sources", [])
             and c["id"] not in used_ids
         ]
 
+        # Cross-borrow from wildcard pool if < 2 eligible
+        if len(eligible) < 2:
+            borrowed = [c for c in passed if c["id"] not in used_ids and c not in eligible][:3]
+            if borrowed:
+                eligible.extend(borrowed)
+                cross_borrow_notes.append(f"今日{cfg['name']}栏目候选不足，从奇文池借调")
+
         if not eligible:
             logger.info(f"  [{section_id}] 无合适候选，跳过")
             continue
 
-        # Limit candidate pool to 8, weighted by source weight
+        # Limit to 8, weighted
         from providers.rss_feed import load_sources as _ls
         sources = {s["source_id"]: s for s in _ls()}
         if len(eligible) > 8:
@@ -314,26 +346,21 @@ def step_curate(passed: list) -> list:
             section_results[section_id] = result
             logger.info(f"    -> {result['title_en'][:50]}")
 
-    # Wildcard: pick from remaining, avoiding topic overlap
-    wildcard_cfg = sections.get("wildcard")
-    if wildcard_cfg:
-        used_topics = []
-        for c in selected:
-            used_topics.extend(c.get("topic_keywords", []))
+    # --- Minimum 3 articles fallback ---
+    if len(selected) < 3:
         remaining = [c for c in passed if c["id"] not in used_ids]
-        if remaining:
-            if len(remaining) > 8:
-                random.shuffle(remaining)
-                remaining = remaining[:8]
-            logger.info(f"  [wildcard] {wildcard_cfg['emoji']}{wildcard_cfg['name']}: {len(remaining)} remaining")
-            result = pick_for_section(wildcard_cfg, remaining)
-            if result:
-                result["section_id"] = "wildcard"
-                selected.append(result)
-                section_results["wildcard"] = result
-                logger.info(f"    -> {result['title_en'][:50]}")
+        remaining.sort(key=lambda c: c.get("word_count", 0), reverse=True)
+        needed = 3 - len(selected)
+        for c in remaining[:needed]:
+            c["section_id"] = "wildcard"
+            c["curation_reason"] = "兜底补入"
+            selected.append(c)
+            section_results["wildcard"] = selected[-1]  # Update wildcard ref
+            logger.info(f"  [fallback] -> {c['title_en'][:50]}")
 
     result = {"selected": selected, "sections": section_results}
+    if cross_borrow_notes:
+        result["cross_borrow_notes"] = cross_borrow_notes
     save_cache("curate", result)
     logger.info(f"Step 3 done: {len(selected)} articles across {len(section_results)} sections")
     return selected

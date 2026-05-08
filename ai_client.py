@@ -25,12 +25,14 @@ SECTION_EDITOR_PROMPT = """你是「三千要看」的{section_emoji}{section_na
 3. 易读性：故事/观点清晰，不需要专业背景就能进入
 4. 深度：加分项，不是必要条件。长不加分，短不减分
 
-请选出最合适的 1 篇，或在确实没有合适候选时返回 null。
+**必须选出 1 篇**最契合本栏目的文章。即使候选不够完美，也请选出相对最好的一篇——读者宁可读到一篇 7 分文章，也不愿打开网站发现这个栏目空着。
+
+仅在以下极端情况才返回 null：全部候选都明显违反栏目主题，或全部候选低于 800 字。
 
 输出 JSON：
 {{
-  "selected_id": "候选ID或null",
-  "reason": "30字内说明为什么选它（或为什么跳过）",
+  "selected_id": "候选ID（必填，不可为null）",
+  "reason": "30字内说明为什么选它",
   "topic_keywords": ["关键词1", "关键词2", "关键词3"],
   "density_score": 3,
   "expected_minutes": 8
@@ -124,7 +126,7 @@ def _init_client():
     logger.error("No AI provider configured. Set DEEPSEEK_API_KEY.")
 
 
-def call_ai(prompt: str, system: str = "You are a helpful assistant.", max_tokens: int = 4096, json_mode: bool = False) -> Tuple[Optional[str], Optional[dict]]:
+def call_ai(prompt: str, system: str = "You are a helpful assistant.", max_tokens: int = 4096, json_mode: bool = False, temperature: float = 0.3) -> Tuple[Optional[str], Optional[dict]]:
     _init_client()
 
     try:
@@ -137,7 +139,7 @@ def call_ai(prompt: str, system: str = "You are a helpful assistant.", max_token
                 {"role": "user", "content": prompt},
             ],
             "max_tokens": max_tokens,
-            "temperature": 0.3,
+            "temperature": temperature,
         }
         if json_mode:
             body["response_format"] = {"type": "json_object"}
@@ -311,7 +313,7 @@ def pick_for_section(section_cfg: dict, candidates: list, used_topics: list = No
         candidates_with_summary=candidates_text,
     )
 
-    result, usage = call_ai(prompt, max_tokens=1024, json_mode=True)
+    result, usage = call_ai(prompt, max_tokens=1024, json_mode=True, temperature=0.6)
     if not result:
         return None
 
