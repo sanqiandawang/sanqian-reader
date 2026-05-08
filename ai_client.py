@@ -100,80 +100,48 @@ def _init_client():
 
     import os
 
-    # Try DeepSeek first (via raw requests — more reliable from Actions)
     deepseek_key = os.getenv("DEEPSEEK_API_KEY", "")
     if deepseek_key:
         from config import DEEPSEEK_BASE_URL
         _client = {"api_key": deepseek_key.strip(), "base_url": DEEPSEEK_BASE_URL.rstrip("/")}
         _provider = "deepseek"
-        logger.info("AI: Using DeepSeek (raw requests)")
+        logger.info("AI: Using DeepSeek")
         return
 
-    # Fall back to Google Gemini
-    google_key = os.getenv("GOOGLE_API_KEY", "") or os.getenv("GEMINI_API_KEY", "")
-    if google_key:
-        try:
-            from google import genai
-            _client = genai.Client(api_key=google_key)
-            _provider = "gemini"
-            logger.info("AI: Using Google Gemini")
-            return
-        except ImportError:
-            logger.warning("google-genai not installed")
-
-    logger.error("No AI provider configured.")
+    logger.error("No AI provider configured. Set DEEPSEEK_API_KEY.")
 
 
 def call_ai(prompt: str, system: str = "You are a helpful assistant.", max_tokens: int = 4096) -> Tuple[Optional[str], Optional[dict]]:
     _init_client()
 
     try:
-        if _provider == "gemini":
-            model = "gemini-2.0-flash"
-            response = _client.models.generate_content(
-                model=model,
-                contents=prompt,
-                config={
-                    'system_instruction': system,
-                    'max_output_tokens': max_tokens,
-                    'temperature': 0.3,
-                },
-            )
-            content = response.text.strip()
-            usage = {
-                "prompt_tokens": response.usage_metadata.prompt_token_count if hasattr(response, 'usage_metadata') and response.usage_metadata else 0,
-                "completion_tokens": response.usage_metadata.candidates_token_count if hasattr(response, 'usage_metadata') and response.usage_metadata else 0,
-                "total_tokens": response.usage_metadata.total_token_count if hasattr(response, 'usage_metadata') and response.usage_metadata else 0,
-            }
-        else:
-            # Raw requests to DeepSeek (bypasses OpenAI SDK connection issues)
-            import requests as req
-            url = f"{_client['base_url']}/chat/completions"
-            resp = req.post(
-                url,
-                headers={
-                    "Authorization": f"Bearer {_client['api_key']}",
-                    "Content-Type": "application/json",
-                },
-                json={
-                    "model": "deepseek-v4-pro",
-                    "messages": [
-                        {"role": "system", "content": system},
-                        {"role": "user", "content": prompt},
-                    ],
-                    "max_tokens": max_tokens,
-                    "temperature": 0.3,
-                },
-                timeout=120,
-            )
-            resp.raise_for_status()
-            data = resp.json()
-            content = data["choices"][0]["message"]["content"].strip()
-            usage = {
-                "prompt_tokens": data.get("usage", {}).get("prompt_tokens", 0),
-                "completion_tokens": data.get("usage", {}).get("completion_tokens", 0),
-                "total_tokens": data.get("usage", {}).get("total_tokens", 0),
-            }
+        import requests as req
+        url = f"{_client['base_url']}/chat/completions"
+        resp = req.post(
+            url,
+            headers={
+                "Authorization": f"Bearer {_client['api_key']}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": "deepseek-v4-pro",
+                "messages": [
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": prompt},
+                ],
+                "max_tokens": max_tokens,
+                "temperature": 0.3,
+            },
+            timeout=120,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        content = data["choices"][0]["message"]["content"].strip()
+        usage = {
+            "prompt_tokens": data.get("usage", {}).get("prompt_tokens", 0),
+            "completion_tokens": data.get("usage", {}).get("completion_tokens", 0),
+            "total_tokens": data.get("usage", {}).get("total_tokens", 0),
+        }
         return content, usage
     except Exception as e:
         logger.error(f"AI call failed: {e}")
