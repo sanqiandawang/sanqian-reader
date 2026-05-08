@@ -100,7 +100,16 @@ def _init_client():
 
     import os
 
-    # Try Google Gemini first
+    # Try DeepSeek first (via raw requests — more reliable from Actions)
+    deepseek_key = os.getenv("DEEPSEEK_API_KEY", "")
+    if deepseek_key:
+        from config import DEEPSEEK_BASE_URL
+        _client = {"api_key": deepseek_key, "base_url": DEEPSEEK_BASE_URL.rstrip("/")}
+        _provider = "deepseek"
+        logger.info("AI: Using DeepSeek (raw requests)")
+        return
+
+    # Fall back to Google Gemini
     google_key = os.getenv("GOOGLE_API_KEY", "") or os.getenv("GEMINI_API_KEY", "")
     if google_key:
         try:
@@ -111,15 +120,6 @@ def _init_client():
             return
         except ImportError:
             logger.warning("google-genai not installed")
-
-    # Fall back to DeepSeek via raw requests (more reliable than OpenAI SDK from Actions)
-    deepseek_key = os.getenv("DEEPSEEK_API_KEY", "")
-    if deepseek_key:
-        from config import DEEPSEEK_BASE_URL
-        _client = {"api_key": deepseek_key, "base_url": DEEPSEEK_BASE_URL.rstrip("/")}
-        _provider = "deepseek"
-        logger.info("AI: Using DeepSeek (requests)")
-        return
 
     logger.error("No AI provider configured.")
 
