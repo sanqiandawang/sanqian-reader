@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Generate static HTML site from pipeline data for GitHub Pages."""
 import json
-import os
+import re
 from pathlib import Path
 from datetime import date
 
 ROOT = Path(__file__).parent
 SITE = ROOT / "site"
 DATA = ROOT / "data"
+BASE = "/sanqian-reader"  # GitHub Pages repo name
 
 CSS = """body{max-width:720px;margin:0 auto;padding:24px 18px;background:#fff;color:#000;font-size:18px;line-height:1.6;font-family:serif}
 h1{text-align:center;font-size:1.6em;margin-bottom:.2em}
@@ -52,7 +53,6 @@ PAGE_CHARS = 2000
 
 
 def markdown_to_html(text: str) -> str:
-    import re
     lines = text.split('\n')
     result = []
     in_list = False
@@ -112,7 +112,6 @@ def markdown_to_html(text: str) -> str:
 
 
 def paginate_html(html: str, chars_per_page: int = PAGE_CHARS) -> list:
-    import re
     blocks = re.split(r'(</(?:p|h[234]|blockquote|li|ul|ol)>\s*)', html)
     paragraphs = []
     i = 0
@@ -145,7 +144,6 @@ def build():
     SITE.mkdir(exist_ok=True)
     (SITE / "articles").mkdir(exist_ok=True)
 
-    # Scan issues
     issues_dir = DATA / "issues"
     issues = []
     if issues_dir.exists():
@@ -158,8 +156,7 @@ def build():
     latest_issue = issues[0] if issues else None
 
     # === index.html ===
-    index_html = build_index(latest_issue, today_str)
-    (SITE / "index.html").write_text(index_html)
+    (SITE / "index.html").write_text(build_index(latest_issue, today_str))
 
     # === Article pages ===
     articles_dir = DATA / "articles"
@@ -186,8 +183,7 @@ def build():
                 page_file.write_text(build_article_page(article, page_html, pi, len(pages), next_id))
 
     # === archive.html ===
-    archive_html = build_archive(issues)
-    (SITE / "archive.html").write_text(archive_html)
+    (SITE / "archive.html").write_text(build_archive(issues))
 
     print(f"Static site built: {len(list(SITE.rglob('*.html')))} pages")
 
@@ -198,7 +194,7 @@ def build_index(issue, today_str):
 <h1>三千要看</h1><div class="date">{today_str}</div>
 <pre class="cat-art">{CAT_ART}</pre>
 <p style="text-align:center;color:#888;margin-top:2em">今天还没有内容，稍后回来看看。</p>
-<div class="footer"><a href="/archive.html">往期</a></div>
+<div class="footer"><a href="{BASE}/archive.html">往期</a></div>
 </body></html>"""
 
     articles_dir = DATA / "articles"
@@ -213,7 +209,7 @@ def build_index(issue, today_str):
         wc = a.get("word_count_zh", 0)
         summary = a.get("summary_zh", "")
         items += f"""<li class="article-item">
-  <a href="/articles/{aid}/">
+  <a href="{BASE}/articles/{aid}/">
     <span class="title">{title}</span>
     <span class="meta">{source} | {wc} 字</span>
     <span class="summary">{summary}</span>
@@ -229,7 +225,7 @@ def build_index(issue, today_str):
 <div class="editor-note">{issue.get("editor_note", "")}</div>
 {fb_html}
 <ul class="article-list">{items}</ul>
-<div class="footer"><a href="/archive.html">往期</a></div>
+<div class="footer"><a href="{BASE}/archive.html">往期</a></div>
 </body></html>"""
 
 
@@ -252,7 +248,7 @@ def build_article_page(article, content_html, page, total, next_id):
     done_link = ""
     if is_last:
         if next_id:
-            done_link = f'| <a class="done-link" href="/articles/{next_id}/">下一篇</a>'
+            done_link = f'| <a class="done-link" href="{BASE}/articles/{next_id}/">下一篇</a>'
         else:
             done_link = '| <span class="done-link">已读完 ✓</span>'
 
@@ -262,7 +258,7 @@ def build_article_page(article, content_html, page, total, next_id):
 <div class="article-header"><h1>{title}</h1><div class="meta">{source} | {wc} 字</div></div>
 <div class="content">{content_html}</div>
 <div class="pagination">{prev_link} <span>第 {page} / {total} 页</span> {next_link}</div>
-<div class="nav-bottom"><a href="/">回首页</a> {done_link}</div>
+<div class="nav-bottom"><a href="{BASE}/">回首页</a> {done_link}</div>
 {cat}</body></html>"""
 
 
@@ -274,7 +270,7 @@ def build_archive(issues):
             note = note[:120] + "..."
         links = ""
         for aid in iss.get("articles", []):
-            links += f'<li><a href="/articles/{aid}/">{aid}</a></li>'
+            links += f'<li><a href="{BASE}/articles/{aid}/">{aid}</a></li>'
         items += f"""<div class="issue">
 <div class="issue-date">{iss["_date"]}</div>
 <div class="issue-note">{note}</div>
@@ -287,7 +283,7 @@ def build_archive(issues):
     return f"""<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>往期 — 三千要看</title><style>{CSS}</style></head><body>
 <h1>往期</h1>
 {items}
-<div class="footer"><a href="/">回首页</a></div>
+<div class="footer"><a href="{BASE}/">回首页</a></div>
 </body></html>"""
 
 
