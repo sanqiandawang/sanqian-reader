@@ -99,11 +99,10 @@ body{max-width:720px;margin:0 auto;padding:48px 24px 72px;background:var(--bg);c
 #push-status a{color:#336}
 .push-hint{font-size:.7em;color:var(--faint);margin-top:8px;line-height:1.5}"""
 
-CAT_ART = """  ▄▀▀▄  ▄▀▀▄
-  █▄▄█  █▄▄█
-  █  █▄▄█  █
-  ▀▄▀▀▀▀▀▄▀
-    ▀▀▀▀▀▀"""
+CAT_ART = """      ／l、
+    （ﾟ､ ｡ ７
+      l  ~ヽ
+      じしf_,)ノ"""
 
 PAGE_CHARS = 2000
 
