@@ -105,7 +105,16 @@ body{max-width:680px;margin:0 auto;padding:48px 24px 72px;background:#fafaf8;col
 .footer a:hover{color:#555}
 
 /* Cat footer */
-.cat-footer{text-align:center;color:#e8e8e4;font-size:.5em;line-height:1.2;margin:56px 0 8px}"""
+.cat-footer{text-align:center;color:#e8e8e4;font-size:.5em;line-height:1.2;margin:56px 0 8px}
+.push-container{margin:0 auto 48px;max-width:400px;text-align:center}
+.cat-btn{background:#fff;border:1.5px solid #1a1a1a;padding:1rem 2rem;cursor:pointer;font-family:inherit;transition:all .2s;display:inline-flex;flex-direction:column;align-items:center;gap:.5rem;border-radius:2px}
+.cat-btn:hover:not(:disabled){background:#1a1a1a;color:#fff}
+.cat-btn:disabled{opacity:.5;cursor:not-allowed}
+.cat-btn .cat-art{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:.7rem;line-height:1.1;margin:0;white-space:pre;color:inherit}
+.cat-btn .cat-label{font-size:.9rem;letter-spacing:.05em}
+#push-status{margin-top:1rem;font-size:.85rem;color:#666;min-height:1.2em;line-height:1.5}
+#push-status a{color:#336;text-decoration:underline}
+.push-hint{font-size:.72rem;color:#bbb;margin-top:.5rem;line-height:1.5}"""
 
 CAT_ART = """      ／l、
     （ﾟ､ ｡ ７
@@ -303,10 +312,61 @@ def build_index(issue, today_str, section_meta):
     return f"""<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>三千要看 - {issue["_date"]}</title><style>{CSS}</style></head><body>
 <div class="masthead"><h1>三千要看</h1><div class="date">{issue["_date"]}</div></div>
 {briefing_html}
+<div class="push-container">
+  <button id="push-btn" class="cat-btn" onclick="triggerPush()">
+    <pre class="cat-art">{CAT_ART}</pre>
+    <span class="cat-label">决定推送到 Kindle</span>
+  </button>
+  <div id="push-status"></div>
+  <div class="push-hint">按钮触发后 2-3 分钟到 Kindle · Token 仅存本机浏览器</div>
+</div>
 <div class="editor-note">{issue.get("editor_note", "")}</div>
 {fb_html}
 {section_html}
 <div class="footer"><a href="{BASE}/archive.html">往期</a></div>
+<script>
+const ISSUE_DATE = "{issue['_date']}";
+async function triggerPush() {{
+  const btn = document.getElementById('push-btn');
+  const status = document.getElementById('push-status');
+  let token = localStorage.getItem('gh_push_token');
+  if (!token) {{
+    token = prompt('首次使用，请输入 GitHub Personal Access Token\\n（仅存本机浏览器，不上传服务器）：');
+    if (!token) return;
+    localStorage.setItem('gh_push_token', token);
+  }}
+  btn.disabled = true;
+  status.textContent = '小猫正在出门送信...';
+  try {{
+    const resp = await fetch(
+      'https://api.github.com/repos/sanqiandawang/sanqian-reader/actions/workflows/manual_push.yml/dispatches',
+      {{
+        method: 'POST',
+        headers: {{
+          'Accept': 'application/vnd.github+json',
+          'Authorization': `Bearer ${{token}}`,
+          'X-GitHub-Api-Version': '2022-11-28',
+        }},
+        body: JSON.stringify({{ ref: 'main', inputs: {{ issue_date: ISSUE_DATE }} }}),
+      }}
+    );
+    if (resp.status === 204) {{
+      status.innerHTML = '✓ 小猫已上路！2-3 分钟后 Kindle 收到。<br><a href="https://github.com/sanqiandawang/sanqian-reader/actions" target="_blank">查看推送进度</a>';
+    }} else if (resp.status === 401) {{
+      status.textContent = '✗ Token 无效，已清除，请刷新重试';
+      localStorage.removeItem('gh_push_token');
+      btn.disabled = false;
+    }} else {{
+      const err = await resp.text();
+      status.textContent = '✗ 推送失败: ' + resp.status + ' ' + err.slice(0, 100);
+      btn.disabled = false;
+    }}
+  }} catch (e) {{
+    status.textContent = '✗ 网络错误: ' + e.message;
+    btn.disabled = false;
+  }}
+}}
+</script>
 </body></html>"""
 
 

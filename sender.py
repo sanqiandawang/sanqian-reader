@@ -1,17 +1,31 @@
-"""邮件发送 — SMTP → Kindle EPUB 推送"""
+"""邮件发送 — SMTP → Kindle EPUB 推送。支持 CLI 调用。"""
+import argparse
 import logging
 import smtplib
 import time
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from email.mime.text import MIMEText
-from datetime import datetime
+from datetime import datetime, date
+from pathlib import Path
 from config import KINDLE_EMAIL, SMTP_USER, SMTP_PASS, SMTP_HOST, SMTP_PORT
 
 logger = logging.getLogger(__name__)
 
+OUTPUT_DIR = Path(__file__).parent / "output"
 
-def send_epub(epub_path, max_retries=3):
+
+def find_epub(issue_date: str = None) -> Path | None:
+    """Find the EPUB file for a given issue date (default: today)."""
+    if issue_date is None:
+        issue_date = date.today().isoformat()
+    epub_path = OUTPUT_DIR / f"三千要看-{issue_date}.epub"
+    if epub_path.exists():
+        return epub_path
+    return None
+
+
+def send_epub(epub_path: str, max_retries: int = 3) -> bool:
     if not KINDLE_EMAIL or not SMTP_USER or not SMTP_PASS:
         logger.error("Missing email config. Check .env")
         return False
@@ -56,3 +70,20 @@ def send_epub(epub_path, max_retries=3):
 
     logger.error(f"Failed after {max_retries} attempts")
     return False
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s", datefmt="%H:%M:%S")
+
+    parser = argparse.ArgumentParser(description="三千要看 Kindle 推送")
+    parser.add_argument("--issue-date", default=None, help="Issue date in YYYY-MM-DD (default: latest)")
+    args = parser.parse_args()
+
+    epub_path = find_epub(args.issue_date)
+    if not epub_path:
+        issue_str = args.issue_date or date.today().isoformat()
+        logger.error(f"No EPUB found for issue {issue_str}")
+        exit(1)
+
+    ok = send_epub(str(epub_path))
+    exit(0 if ok else 1)

@@ -571,13 +571,14 @@ def step_publish(approved: list, send_epub_flag: bool = True) -> Optional[dict]:
 
     save_cache("publish", issue)
 
-    # EPUB generation and send
+    # Always generate EPUB (for manual push), only send if flag set
+    epub_path = _generate_epub(final_articles, issue)
     epub_sent = False
-    if send_epub_flag and not issue_epub_sent(TODAY):
-        epub_ok = _generate_and_send_epub(final_articles, issue)
-        if epub_ok:
+    if epub_path and send_epub_flag and not issue_epub_sent(TODAY):
+        from sender import send_epub
+        epub_sent = send_epub(str(epub_path))
+        if epub_sent:
             mark_epub_sent(TODAY)
-            epub_sent = True
 
     # Daily log
     _write_daily_log(issue, final_articles, epub_sent)
@@ -589,9 +590,9 @@ def step_publish(approved: list, send_epub_flag: bool = True) -> Optional[dict]:
     return issue
 
 
-def _generate_and_send_epub(articles: list, issue: dict) -> bool:
+def _generate_epub(articles: list, issue: dict):
+    """Generate EPUB file, return path or None."""
     try:
-        from sender import send_epub
         from ebooklib import epub as epub_lib
 
         book = epub_lib.EpubBook()
@@ -648,13 +649,11 @@ p{text-indent:2em;margin:0 0 .8em;text-align:justify}
         epub_lib.write_epub(str(epub_path), book)
         logger.info(f"EPUB: {epub_path}")
 
-        from config import KINDLE_EMAIL
-        if KINDLE_EMAIL:
-            return send_epub(str(epub_path))
-        return False
+        logger.info(f"EPUB generated: {epub_path}")
+        return epub_path
     except Exception as e:
-        logger.error(f"EPUB generation/send failed: {e}")
-        return False
+        logger.error(f"EPUB generation failed: {e}")
+        return None
 
 
 def _generate_cover(articles: list) -> Optional[str]:
@@ -767,7 +766,7 @@ def _log_usage(total_tokens: int):
 
 # ==================== Main Entry ====================
 
-def run_pipeline(send_epub: bool = True) -> Optional[dict]:
+def run_pipeline(send_epub: bool = False) -> Optional[dict]:
     """Run full pipeline with checkpoint/resume."""
     clear_stale_cache()
 

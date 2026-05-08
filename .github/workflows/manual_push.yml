@@ -1,0 +1,38 @@
+name: Manual Push to Kindle
+
+on:
+  workflow_dispatch:
+    inputs:
+      issue_date:
+        description: 'Issue date YYYY-MM-DD (blank = latest)'
+        required: false
+        default: ''
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Push to Kindle
+        env:
+          SMTP_HOST: smtp.126.com
+          SMTP_PORT: "465"
+          SMTP_USER: z3647512@126.com
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          KINDLE_EMAIL: zhuaipi888@kindle.com
+        run: |
+          ISSUE="${{ github.event.inputs.issue_date }}"
+          if [ -z "$ISSUE" ] || [ "$ISSUE" = "" ]; then
+            python sender.py
+          else
+            python sender.py --issue-date "$ISSUE"
+          fi
