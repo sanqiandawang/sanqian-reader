@@ -98,17 +98,10 @@ def _init_client():
     if _client is not None:
         return
 
-    from config import DEEPSEEK_API_KEY
+    import os
 
     # Try Google Gemini first
-
-    google_key = DEEPSEEK_API_KEY  # We're reusing the config key name for now; check if it looks like a Google key
-    # Actually, check for separate env var
-    import os
-    google_key = os.getenv("GOOGLE_API_KEY", "")
-    if not google_key:
-        google_key = os.getenv("GEMINI_API_KEY", "")
-
+    google_key = os.getenv("GOOGLE_API_KEY", "") or os.getenv("GEMINI_API_KEY", "")
     if google_key:
         try:
             from google import genai
@@ -117,19 +110,18 @@ def _init_client():
             logger.info("AI: Using Google Gemini")
             return
         except ImportError:
-            logger.warning("google-genai not installed, falling back to DeepSeek")
+            logger.warning("google-genai not installed")
 
-    # Fall back to DeepSeek
+    # Fall back to DeepSeek via raw requests (more reliable than OpenAI SDK from Actions)
     deepseek_key = os.getenv("DEEPSEEK_API_KEY", "")
     if deepseek_key:
-        from openai import OpenAI
         from config import DEEPSEEK_BASE_URL
-        _client = OpenAI(api_key=deepseek_key, base_url=DEEPSEEK_BASE_URL)
+        _client = {"api_key": deepseek_key, "base_url": DEEPSEEK_BASE_URL.rstrip("/")}
         _provider = "deepseek"
-        logger.info("AI: Using DeepSeek")
+        logger.info("AI: Using DeepSeek (requests)")
         return
 
-    logger.error("No AI provider configured. Set GOOGLE_API_KEY or DEEPSEEK_API_KEY.")
+    logger.error("No AI provider configured.")
 
 
 def call_ai(prompt: str, system: str = "You are a helpful assistant.", max_tokens: int = 4096) -> Tuple[Optional[str], Optional[dict]]:
@@ -137,8 +129,7 @@ def call_ai(prompt: str, system: str = "You are a helpful assistant.", max_token
 
     try:
         if _provider == "gemini":
-            from google import genai
-            model = "gemini-2.0-flash"  # 15 RPM free tier vs 5 RPM for 2.5
+            model = "gemini-2.0-flash"
             response = _client.models.generate_content(
                 model=model,
                 contents=prompt,
@@ -155,21 +146,33 @@ def call_ai(prompt: str, system: str = "You are a helpful assistant.", max_token
                 "total_tokens": response.usage_metadata.total_token_count if hasattr(response, 'usage_metadata') and response.usage_metadata else 0,
             }
         else:
-            from config import DEEPSEEK_MODEL
-            response = _client.chat.completions.create(
-                model=DEEPSEEK_MODEL,
-                messages=[
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": prompt},
-                ],
-                max_tokens=max_tokens,
-                temperature=0.3,
+            # Raw requests to DeepSeek (bypasses OpenAI SDK connection issues)
+            import requests as req
+            url = f"{_client['base_url']}/chat/completions"
+            resp = req.post(
+                url,
+                headers={
+                    "Authorization": f"Bearer {_client['api_key']}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": "deepseek-v4-pro",
+                    "messages": [
+                        {"role": "system", "content": system},
+                        {"role": "user", "content": prompt},
+                    ],
+                    "max_tokens": max_tokens,
+                    "temperature": 0.3,
+                },
+                timeout=120,
             )
-            content = response.choices[0].message.content.strip()
+            resp.raise_for_status()
+            data = resp.json()
+            content = data["choices"][0]["message"]["content"].strip()
             usage = {
-                "prompt_tokens": response.usage.prompt_tokens,
-                "completion_tokens": response.usage.completion_tokens,
-                "total_tokens": response.usage.total_tokens,
+                "prompt_tokens": data.get("usage", {}).get("prompt_tokens", 0),
+                "completion_tokens": data.get("usage", {}).get("completion_tokens", 0),
+                "total_tokens": data.get("usage", {}).get("total_tokens", 0),
             }
         return content, usage
     except Exception as e:
