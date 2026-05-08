@@ -1,4 +1,5 @@
 import logging
+import re
 import requests
 from typing import Optional
 
@@ -6,6 +7,28 @@ from providers.base import ContentProvider, ProviderMetadata
 from config import JINA_BASE, JINA_TIMEOUT
 
 logger = logging.getLogger("jina")
+
+JINA_HEADER_PATTERNS = [
+    r'^Title:\s*.*$',
+    r'^URL Source:\s*.*$',
+    r'^Published Time:\s*.*$',
+    r'^Markdown Content:\s*$',
+    r'^> URL Source:.*$',
+    r'^> Published Time:.*$',
+    r'^> Markdown Content:.*$',
+]
+
+
+def strip_jina_headers(text: str) -> str:
+    """Strip Jina Reader metadata headers from the first 10 lines only."""
+    lines = text.split('\n')
+    head, body = lines[:10], lines[10:]
+    cleaned = []
+    for ln in head:
+        if any(re.match(p, ln.strip()) for p in JINA_HEADER_PATTERNS):
+            continue
+        cleaned.append(ln)
+    return '\n'.join(cleaned + body).lstrip('\n')
 
 
 class JinaProvider(ContentProvider):
@@ -21,6 +44,9 @@ class JinaProvider(ContentProvider):
             text = resp.text.strip()
             if not text or len(text) < 200:
                 return None, None, f"Jina returned short content ({len(text)} chars)"
+
+            # Strip Jina metadata headers before extracting title
+            text = strip_jina_headers(text)
 
             words = len(text.split())
             title = self._extract_title(text)
