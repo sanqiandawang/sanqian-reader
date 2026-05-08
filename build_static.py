@@ -52,6 +52,7 @@ CSS = """body{max-width:720px;margin:0 auto;padding:48px 24px 64px;background:#f
 .nav-bottom a:hover{color:#000}
 
 .spoiler-tag{display:inline-block;padding:0 5px;border:1px solid #c66;color:#c66;font-size:.78em;margin-left:6px;vertical-align:middle}
+.zh-tag{display:inline-block;padding:0 5px;border:1px solid #ddd;color:#aaa;font-size:.72em;margin-left:6px;vertical-align:middle}
 
 .briefing{margin:0 0 40px;padding:0}
 .briefing h2{font-size:.78em;font-weight:400;color:#bbb;letter-spacing:.08em;margin-bottom:16px}
@@ -265,10 +266,11 @@ def build_index(issue, today_str, section_meta):
             wc = a.get("word_count_zh", 0)
             summary = a.get("summary_zh", "")
             aid_ = a.get("id", "")
+            zh_tag = '<span class="zh-tag">中文原创</span>' if a.get("language") == "zh" else ""
             spoiler_tag = '<span class="spoiler-tag">[剧透]</span>' if a.get("has_spoiler") else ""
             section_html += f"""<div class="article-item">
   <a href="{BASE}/articles/{aid_}/">
-    <span class="title">{title}{spoiler_tag}</span>
+    <span class="title">{title}{zh_tag}{spoiler_tag}</span>
     <span class="meta">{source} | 约 {max(1, wc//600)} 分钟</span>
     <span class="summary">{summary}</span>
   </a>
@@ -372,10 +374,11 @@ async function triggerPush() {{
             wc = a.get("word_count_zh", 0)
             summary = a.get("summary_zh", "")
             aid_ = a.get("id", "")
+            zh_tag = '<span class="zh-tag">中文原创</span>' if a.get("language") == "zh" else ""
             spoiler_tag = '<span class="spoiler-tag">[剧透]</span>' if a.get("has_spoiler") else ""
             section_html += f"""<div class="article-item">
   <a href="{BASE}/articles/{aid_}/">
-    <span class="title">{title}{spoiler_tag}</span>
+    <span class="title">{title}{zh_tag}{spoiler_tag}</span>
     <span class="meta">{source} | 约 {max(1, wc//600)} 分钟</span>
     <span class="summary">{summary}</span>
   </a>

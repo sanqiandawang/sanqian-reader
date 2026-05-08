@@ -34,6 +34,7 @@ def fetch_rss_feeds(since_hours: int = 48) -> list[dict]:
         name = src["name"]
         rss_url = src["rss"]
         source_id = src.get("source_id", name.lower().replace(" ", "_"))
+        language = src.get("language", "en")
         try:
             feed = feedparser.parse(rss_url)
             if feed.bozo:
@@ -57,6 +58,7 @@ def fetch_rss_feeds(since_hours: int = 48) -> list[dict]:
                     "title": title,
                     "source_name": name,
                     "source_id": source_id,
+                    "language": language,
                     "published_at": published.isoformat() if published else None,
                 })
             logger.info(f"RSS {name}: {len(feed.entries)} entries")

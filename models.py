@@ -21,6 +21,8 @@ class Article:
     section_id: str = ""
     has_spoiler: bool = False
     topic_keywords: list[str] = field(default_factory=list)
+    language: str = "en"
+    translation_skipped: bool = False
     read_status: str = "unread"
     read_at: Optional[str] = None
     fetched_at: Optional[str] = None

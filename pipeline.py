@@ -14,7 +14,7 @@ from typing import Optional, Tuple
 from config import (
     CACHE_DIR, CACHE_RETENTION_DAYS, MAX_ARTICLE_WORDS, MAX_CONCURRENCY,
     MAX_RETRIES, MIN_ARTICLES_PER_ISSUE, TRANSLATED_MIN_CHARS,
-    SCREEN_MIN_WORDS, DAILY_TOKEN_BUDGET,
+    SCREEN_MIN_WORDS, MIN_CHINESE_CHARS, DAILY_TOKEN_BUDGET,
 )
 from providers.rss_feed import fetch_rss_feeds, url_to_id
 from providers.jina import JinaProvider
@@ -206,8 +206,11 @@ def step_fetch() -> list:
             logger.warning(f"All providers failed for {url}: {error}")
             continue
 
-        if metadata.word_count < SCREEN_MIN_WORDS:
-            logger.debug(f"Too short ({metadata.word_count} words): {metadata.title}")
+        lang = entry.get("language", "en")
+        min_ok = (lang == "zh" and len(text) >= MIN_CHINESE_CHARS) or \
+                 (lang != "zh" and metadata.word_count >= SCREEN_MIN_WORDS)
+        if not min_ok:
+            logger.debug(f"Too short ({metadata.word_count} words / {len(text)} chars, {lang}): {metadata.title}")
             continue
 
         candidate = {
@@ -215,6 +218,7 @@ def step_fetch() -> list:
             "url": url,
             "source_name": entry["source_name"],
             "source_id": entry.get("source_id", ""),
+            "language": entry.get("language", "en"),
             "title_en": metadata.title,
             "text_en": text,
             "word_count": metadata.word_count,
@@ -379,6 +383,16 @@ def step_translate(selected: list) -> list:
     to_translate = []
     skipped_long = []
     for c in selected:
+        # Skip translation for Chinese sources
+        if c.get("language") == "zh":
+            c["content_zh"] = c["text_en"]  # text_en already contains Chinese original
+            c["word_count_zh"] = len(c["text_en"].replace(" ", "").replace("\n", ""))
+            c["translation_skipped"] = True
+            c["translation_model"] = "native"
+            c["prompt_version"] = "zh-original"
+            translated.append(c)
+            logger.info(f"  SKIP zh: {c['title_en'][:40]} ({c['word_count_zh']} zh chars)")
+            continue
         if c["word_count"] > MAX_ARTICLE_WORDS:
             skipped_long.append(c)
             logger.info(f"  SKIP long ({c['word_count']} words): {c['title_en'][:60]}")
@@ -455,6 +469,13 @@ def step_review(translated: list) -> list:
     demoted = []
 
     for c in translated:
+        # Skip review for zh native content
+        if c.get("translation_skipped"):
+            c["quality_score"] = {"terms": 5, "fluency": 5, "completeness": 5, "note": "中文源，跳过翻译校验"}
+            approved.append(c)
+            logger.info(f"  SKIP review zh: {c['title_en'][:40]}")
+            continue
+
         demote_reasons = []
 
         if c["word_count_zh"] < 800:

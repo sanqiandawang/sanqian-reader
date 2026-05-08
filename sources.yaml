@@ -1,34 +1,45 @@
-# 三千要看 v2 — 18 源 RSS 定义
+# 三千要看 v2 — 26 源 RSS 定义 (18 EN + 8 ZH)
 # source_id 用于 sections.yaml 跨引用
 
 sources:
-  # === 思想/文化/长文 ===
-  - { source_id: aeon, name: "Aeon", weight: 5, rss: "https://aeon.co/feed.rss" }
-  - { source_id: the_atlantic, name: "The Atlantic", weight: 5, rss: "https://feeds.feedburner.com/TheAtlantic" }
-  - { source_id: newyorker_magazine, name: "The New Yorker Magazine", weight: 4, rss: "https://www.newyorker.com/feed/magazine" }
-  - { source_id: newyorker_culture, name: "The New Yorker Culture", weight: 3, rss: "https://www.newyorker.com/feed/culture" }
-  - { source_id: guardian_long, name: "The Guardian Long Read", weight: 4, rss: "https://www.theguardian.com/news/series/the-long-read/rss" }
-  - { source_id: longreads, name: "Longreads", weight: 3, rss: "https://longreads.com/feed/" }
-  - { source_id: harpers, name: "Harper's Magazine", weight: 4, rss: "https://harpers.org/feed/" }
-  - { source_id: lrb, name: "London Review of Books", weight: 4, rss: "https://www.lrb.co.uk/feeds/rss" }
+  # === 思想/文化/长文 (EN) ===
+  - { source_id: aeon, name: "Aeon", weight: 5, language: en, rss: "https://aeon.co/feed.rss" }
+  - { source_id: the_atlantic, name: "The Atlantic", weight: 5, language: en, rss: "https://feeds.feedburner.com/TheAtlantic" }
+  - { source_id: newyorker_magazine, name: "The New Yorker Magazine", weight: 4, language: en, rss: "https://www.newyorker.com/feed/magazine" }
+  - { source_id: newyorker_culture, name: "The New Yorker Culture", weight: 3, language: en, rss: "https://www.newyorker.com/feed/culture" }
+  - { source_id: guardian_long, name: "The Guardian Long Read", weight: 4, language: en, rss: "https://www.theguardian.com/news/series/the-long-read/rss" }
+  - { source_id: longreads, name: "Longreads", weight: 3, language: en, rss: "https://longreads.com/feed/" }
+  - { source_id: harpers, name: "Harper's Magazine", weight: 4, language: en, rss: "https://harpers.org/feed/" }
+  - { source_id: lrb, name: "London Review of Books", weight: 4, language: en, rss: "https://www.lrb.co.uk/feeds/rss" }
 
-  # === 罪案/调查 ===
-  - { source_id: atavist, name: "The Atavist Magazine", weight: 5, rss: "https://magazine.atavist.com/feed/" }
-  - { source_id: longreads_crime, name: "Longreads Crime", weight: 4, rss: "https://longreads.com/category/crime/feed/" }
+  # === 罪案/调查 (EN) ===
+  - { source_id: atavist, name: "The Atavist Magazine", weight: 5, language: en, rss: "https://magazine.atavist.com/feed/" }
+  - { source_id: longreads_crime, name: "Longreads Crime", weight: 4, language: en, rss: "https://longreads.com/category/crime/feed/" }
 
-  # === 国际/社会 ===
-  - { source_id: restofworld, name: "Rest of World", weight: 4, rss: "https://restofworld.org/feed/" }
+  # === 国际/社会 (EN) ===
+  - { source_id: restofworld, name: "Rest of World", weight: 4, language: en, rss: "https://restofworld.org/feed/" }
 
-  # === 科学 ===
-  - { source_id: nautilus, name: "Nautilus", weight: 3, rss: "https://nautil.us/feed/" }
-  - { source_id: quanta, name: "Quanta Magazine", weight: 3, rss: "https://www.quantamagazine.org/feed/" }
+  # === 科学 (EN) ===
+  - { source_id: nautilus, name: "Nautilus", weight: 3, language: en, rss: "https://nautil.us/feed/" }
+  - { source_id: quanta, name: "Quanta Magazine", weight: 3, language: en, rss: "https://www.quantamagazine.org/feed/" }
 
-  # === 影评 ===
-  - { source_id: ringer_movies, name: "The Ringer Movies", weight: 4, rss: "https://www.theringer.com/rss/movies/index.xml" }
-  - { source_id: vulture_movies, name: "Vulture Movies", weight: 4, rss: "https://www.vulture.com/rss/movies/index.xml" }
+  # === 影评 (EN) ===
+  - { source_id: ringer_movies, name: "The Ringer Movies", weight: 4, language: en, rss: "https://www.theringer.com/rss/movies/index.xml" }
+  - { source_id: vulture_movies, name: "Vulture Movies", weight: 4, language: en, rss: "https://www.vulture.com/rss/movies/index.xml" }
 
-  # === 游戏/动漫/流行文化 ===
-  - { source_id: anime_news_network, name: "Anime News Network", weight: 3, rss: "https://www.animenewsnetwork.com/all/rss.xml" }
-  - { source_id: aftermath, name: "Aftermath", weight: 3, rss: "https://aftermath.site/feed" }
-  - { source_id: polygon, name: "Polygon", weight: 3, rss: "https://www.polygon.com/rss/index.xml" }
-  - { source_id: rock_paper_shotgun, name: "Rock Paper Shotgun", weight: 2, rss: "https://www.rockpapershotgun.com/feed/" }
+  # === 游戏/动漫/流行文化 (EN) ===
+  - { source_id: anime_news_network, name: "Anime News Network", weight: 3, language: en, rss: "https://www.animenewsnetwork.com/all/rss.xml" }
+  - { source_id: aftermath, name: "Aftermath", weight: 3, language: en, rss: "https://aftermath.site/feed" }
+  - { source_id: polygon, name: "Polygon", weight: 3, language: en, rss: "https://www.polygon.com/rss/index.xml" }
+  - { source_id: rock_paper_shotgun, name: "Rock Paper Shotgun", weight: 2, language: en, rss: "https://www.rockpapershotgun.com/feed/" }
+
+  # === 中文个人博客 / 文化长文 (ZH) ===
+  - { source_id: ruanyifeng, name: "阮一峰", weight: 4, language: zh, rss: "https://www.ruanyifeng.com/blog/atom.xml" }
+  - { source_id: muyao, name: "木遥的窗子", weight: 4, language: zh, rss: "http://blog.farmostwood.net/feed" }
+  - { source_id: zreading, name: "左岸读书", weight: 3, language: zh, rss: "http://www.zreading.cn/feed" }
+  - { source_id: chendanji, name: "扯氮集", weight: 3, language: zh, rss: "http://weiwuhui.com/feed" }
+  - { source_id: tumutanzi, name: "土木坛子", weight: 3, language: zh, rss: "https://tumutanzi.com/feed" }
+  - { source_id: sspai, name: "少数派", weight: 4, language: zh, rss: "https://sspai.com/feed" }
+  - { source_id: gcores, name: "机核", weight: 4, language: zh, rss: "https://www.gcores.com/rss" }
+  - { source_id: williamlong, name: "月光博客", weight: 3, language: zh, rss: "http://feed.williamlong.info/" }
+
