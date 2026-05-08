@@ -8,7 +8,7 @@ sections:
     description: "真实犯罪、卧底调查、骗局、悬案、法律纠纷叙事；虚构罪案小说节选/书评亦可"
     items_per_issue: 1
     min_chars_zh: 2500
-    sources: [longreads, the_atlantic, the_new_yorker, guardian_long]
+    sources: [atavist, longreads, longreads_crime, newyorker_magazine, the_atlantic, guardian_long]
     selection_hints:
       prefer: ["叙事张力强", "人物鲜活", "有反转或悬念", "卧底/调查/法庭/欺诈"]
       avoid: ["纯案件综述", "过度学术化的犯罪学分析"]
@@ -19,7 +19,7 @@ sections:
     description: "电影/动画评论、导演访谈、影史回顾、流媒体推荐、动画产业故事"
     items_per_issue: 1
     min_chars_zh: 1800
-    sources: [the_atlantic, the_new_yorker, polygon, anime_news_network]
+    sources: [ringer_movies, vulture_movies, newyorker_culture, the_atlantic, polygon, rock_paper_shotgun, anime_news_network, aftermath]
     selection_hints:
       prefer: ["有明确观点", "推荐价值高", "新片或被低估老片", "动画/作者电影"]
       avoid: ["票房新闻", "流水账采访"]
@@ -31,7 +31,7 @@ sections:
     description: "社会非虚构，主题不限。优先拓宽视野的视角而非纯粹深度"
     items_per_issue: 1
     min_chars_zh: 3000
-    sources: [the_atlantic, guardian_long, the_new_yorker, aeon]
+    sources: [the_atlantic, guardian_long, newyorker_magazine, harpers, aeon, restofworld, lrb]
     selection_hints:
       prefer: ["视角新颖", "故事性强", "国际或跨文化议题"]
       avoid: ["美国国内政治选举评论", "纯学术综述", "已成共识的旧话题"]
