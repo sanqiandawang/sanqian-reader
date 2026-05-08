@@ -95,7 +95,7 @@ CAT_ART = """      ／l、
       l  ~ヽ
       じしf_,)ノ"""
 
-SLOGAN = "三千万象，一猫读尽"
+SLOGAN = "本页面由三千小猫主编"
 
 PAGE_CHARS = 2000
 
@@ -318,14 +318,14 @@ async function triggerPush() {{
     localStorage.setItem('gh_push_token', token);
   }}
   btn.disabled = true;
-  status.textContent = '发送中...';
+  status.textContent = '小猫正在出门送信...';
   try {{
     const resp = await fetch(
       'https://api.github.com/repos/sanqiandawang/sanqian-reader/actions/workflows/manual_push.yml/dispatches',
       {{ method:'POST', headers:{{ 'Accept':'application/vnd.github+json','Authorization':`Bearer ${{token}}`,'X-GitHub-Api-Version':'2022-11-28' }}, body:JSON.stringify({{ ref:'main', inputs:{{ issue_date:ISSUE_DATE }} }}) }}
     );
     if (resp.status === 204) {{
-      status.innerHTML = '✓ 已发送，2-3 分钟后到 Kindle';
+      status.innerHTML = '✓ 小猫已上路！2-3 分钟后 Kindle 收到。';
     }} else if (resp.status === 401) {{
       status.textContent = 'Token 无效，已清除';
       localStorage.removeItem('gh_push_token'); btn.disabled = false;
