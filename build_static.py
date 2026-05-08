@@ -12,15 +12,14 @@ DATA = ROOT / "data"
 BASE = "/sanqian-reader"
 
 CSS = """body{max-width:720px;margin:0 auto;padding:48px 24px 64px;background:#fff;color:#1a1a1a;font-size:17px;line-height:1.65;font-family:"Noto Serif CJK SC",Georgia,"Times New Roman",serif;-webkit-font-smoothing:antialiased}
-@media(max-width:600px){body{padding:32px 16px 56px;font-size:16px}}
+@media(max-width:600px){body{padding:24px 14px 48px;font-size:16px}}
 
-/* Content-first: subtle date top */
 .date-top{text-align:center;color:#bbb;font-size:.78em;letter-spacing:.1em;margin-bottom:40px}
+@media(max-width:600px){.date-top{margin-bottom:28px}}
 
-/* Editorial note */
 .editor-note{border-left:3px solid #e0e0dc;padding:.6em 1.2em;margin:0 0 40px;background:#fafaf8;font-size:.9em;line-height:1.75;color:#666}
+@media(max-width:600px){.editor-note{margin-bottom:28px;padding:.5em .8em;font-size:.85em}}
 
-/* Section cards */
 .section-card{margin:0 0 40px;padding:0}
 .section-card h2{font-size:.78em;font-weight:400;color:#bbb;letter-spacing:.08em;margin-bottom:20px;padding-bottom:8px;border-bottom:1px solid #f0f0ec}
 .section-card .article-item{padding:14px 0;border-bottom:1px solid #f5f5f0}
@@ -29,30 +28,31 @@ CSS = """body{max-width:720px;margin:0 auto;padding:48px 24px 64px;background:#f
 .section-card .title{font-size:1.08em;font-weight:600;line-height:1.45;display:block;margin-bottom:4px;color:#111}
 .section-card .meta{font-size:.75em;color:#bbb;display:block;margin-bottom:6px}
 .section-card .summary{font-size:.85em;color:#888;line-height:1.6;display:block}
-@media(max-width:600px){.section-card{margin-bottom:32px}.section-card .title{font-size:1em}}
+@media(max-width:600px){.section-card{margin-bottom:28px}.section-card .title{font-size:1em}.section-card .summary{font-size:.82em}}
 
-/* Article page */
 .article-header{margin-bottom:32px;padding-bottom:20px;border-bottom:1px solid #f0f0ec}
 .article-header h1{font-size:1.4em;font-weight:600;line-height:1.4;margin-bottom:8px}
 .article-header .meta{color:#bbb;font-size:.8em}
+@media(max-width:600px){.article-header{margin-bottom:24px;padding-bottom:14px}.article-header h1{font-size:1.2em}}
+
 .content{line-height:1.85}
 .content p{text-indent:2em;margin:.5em 0}
 .content h2,.content h3{margin:1.4em 0 .5em}
 .content blockquote{border-left:3px solid #e8e8e4;padding:.4em 1em;margin:.8em 0;color:#777}
-.content sup a{color:#888;text-decoration:none;font-size:.75em}
-.content sup a:hover{color:#333}
+.content a{color:#555;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#ccc}
+@media(max-width:600px){.content p{text-indent:1.5em}.content{font-size:.95em}}
+
 .pagination{margin:2em 0;text-align:right;font-size:.85em;color:#999}
 .pagination a{padding:.3em .8em;text-decoration:none;color:#555;border:1px solid #e0e0dc}
 .pagination span{color:#bbb}
+@media(max-width:600px){.pagination{text-align:center;font-size:.8em}}
+
 .nav-bottom{margin-top:2em;padding-top:1em;border-top:1px solid #f0f0ec;text-align:center;font-size:.9em}
 .nav-bottom a{text-decoration:none;color:#555;margin:0 8px}
 .nav-bottom a:hover{color:#000}
-.done-link{color:#aaa;font-size:.85em}
 
-/* Spoiler tag */
 .spoiler-tag{display:inline-block;padding:0 5px;border:1px solid #c66;color:#c66;font-size:.78em;margin-left:6px;vertical-align:middle}
 
-/* Briefing card */
 .briefing{margin:0 0 40px;padding:0}
 .briefing h2{font-size:.78em;font-weight:400;color:#bbb;letter-spacing:.08em;margin-bottom:16px}
 .briefing ol{list-style:none;padding:0}
@@ -62,25 +62,22 @@ CSS = """body{max-width:720px;margin:0 auto;padding:48px 24px 64px;background:#f
 .briefing h3 a{color:#111;text-decoration:none}
 .briefing p{font-size:.85em;color:#888;line-height:1.65;margin:0}
 .briefing small{font-size:.7em;color:#ccc}
+@media(max-width:600px){.briefing{margin-bottom:28px}.briefing h3{font-size:.9em}.briefing p{font-size:.82em}}
 
-/* Archive */
 .issue{margin-bottom:28px}
 .issue-date{font-size:1em;font-weight:600;margin-bottom:4px}
 .issue-note{font-size:.85em;color:#888;margin-bottom:8px;line-height:1.6}
 .issue ul{list-style:none;padding:0}
 .issue li{padding:2px 0;font-size:.9em}
 .issue a{color:inherit;text-decoration:none}
-.issue a:hover{text-decoration:underline}
 
-/* Footer — compact branding */
 .site-footer{text-align:center;margin-top:64px;padding-top:32px;border-top:1px solid #f0f0ec}
 .footer-cat{text-align:center;color:#e0e0dc;font-size:.5em;line-height:1.15;margin:0 0 8px;white-space:pre}
 .slogan{font-size:.82em;color:#bbb;letter-spacing:.06em;margin-bottom:12px}
 .footer-links{font-size:.75em;color:#ccc;margin-bottom:24px}
 .footer-links a{color:#bbb;text-decoration:none;margin:0 4px}
-.footer-links a:hover{color:#555}
+@media(max-width:600px){.site-footer{margin-top:48px;padding-top:24px}.footer-cat{font-size:.45em}}
 
-/* Push button in footer */
 .push-container{margin:0 auto;text-align:center}
 .cat-btn{display:inline-block;padding:6px 20px;background:none;border:1px solid #e0e0dc;cursor:pointer;font-family:inherit;font-size:.78em;color:#aaa;letter-spacing:.04em}
 .cat-btn:hover:not(:disabled){border-color:#888;color:#555}
