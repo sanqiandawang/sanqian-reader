@@ -3,7 +3,7 @@ name: Daily Pipeline
 on:
   schedule:
     - cron: "0 22 * * *"  # 6:00 CST
-  workflow_dispatch:  # Manual trigger from GitHub UI
+  workflow_dispatch:
 
 jobs:
   pipeline:
@@ -25,20 +25,9 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Test DeepSeek connectivity
-        run: |
-          curl -s -w "\nHTTP %{http_code}" https://api.deepseek.com/v1/models -H "Authorization: Bearer ${{ secrets.DEEPSEEK_API_KEY }}" | tail -3
-          python -c "
-          import requests
-          r = requests.get('https://api.deepseek.com/v1/models', headers={'Authorization': 'Bearer ${{ secrets.DEEPSEEK_API_KEY }}'}, timeout=10)
-          print(f'Python requests: HTTP {r.status_code}')
-          "
-
       - name: Run pipeline
         env:
-          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-          DEEPSEEK_BASE_URL: https://api.deepseek.com/v1
-          DEEPSEEK_MODEL: deepseek-chat
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           SMTP_HOST: smtp.126.com
           SMTP_PORT: "465"
           SMTP_USER: z3647512@126.com

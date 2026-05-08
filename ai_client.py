@@ -1,24 +1,14 @@
+"""AI client — supports both Gemini (primary) and DeepSeek (fallback)"""
 import json
 import logging
-import time
 import re
 from typing import Optional, Tuple
-from openai import OpenAI
-from config import DEEPSEEK_API_KEY, DEEPSEEK_BASE_URL, DEEPSEEK_MODEL
 
 logger = logging.getLogger("ai")
 
+# Try Gemini first (better cloud connectivity), fall back to DeepSeek
 _client = None
-
-
-def _get_client():
-    global _client
-    if _client is None:
-        _client = OpenAI(api_key=DEEPSEEK_API_KEY, base_url=DEEPSEEK_BASE_URL)
-    return _client
-
-
-TRANSLATION_PROMPT_VERSION = "v1"
+_provider = None  # "gemini" or "deepseek"
 
 CURATION_PROMPT = """You are a professional editor curating today's recommended reads from English long-form articles.
 
@@ -38,25 +28,21 @@ Output ONLY a JSON object with selected article IDs (5-8), reasons, and domain c
 {{
   "selected": ["id1", "id2"],
   "reasons": {{"id1": "Why this article was selected", "id2": "..."}},
-  "domain_note": "thought: 3 articles, science: 2, gaming_anime: 2. Science candidates were strong across the board."
+  "domain_note": "thought: 3 articles, science: 2, gaming_anime: 2."
 }}
 ```"""
 
+TRANSLATION_PROMPT_VERSION = "v2"
 
-TRANSLATION_PROMPT = """Translate the following English article into Chinese. Requirements:
+TRANSLATION_SYSTEM = """You are a professional translator. Translate the following English article into Chinese.
 
+Requirements:
 1. Fidelity, clarity, elegance: convey the original meaning accurately, write naturally in Chinese, preserve the original style
 2. Terminology consistency: keep personal names, work titles, and technical terms consistent throughout
 3. Mark uncertain translations: use [译注: explanation] for terms you are unsure about
 4. Never omit: translate every paragraph fully, do not summarize or skip content
 5. Preserve paragraph structure from the original
-
-Original text:
-
-{text}
-
-Complete Chinese translation:"""
-
+6. Output ONLY the Chinese translation, no commentary, no notes at the beginning or end"""
 
 REVIEW_PROMPT = """Evaluate the translation quality of the following Chinese text against the original English excerpt.
 
@@ -75,7 +61,6 @@ Score each dimension 0-10. Output ONLY a JSON object:
 {{"terms": 8, "fluency": 7, "completeness": 9}}
 ```"""
 
-
 EDITOR_NOTE_PROMPT = """You are an opinionated editor. Write an editor's note (150-200 Chinese characters) for today's issue.
 
 Today's articles (title + source + selection reason):
@@ -90,7 +75,6 @@ Requirements:
 
 Write the editor's note in Chinese:"""
 
-
 SEMANTIC_BLACKLIST_PROMPT = """Determine whether the following article matches any noise topic.
 
 Article title: {title}
@@ -99,37 +83,97 @@ Article opening (500 chars): {excerpt}
 Noise topics — articles matching these should be filtered out:
 {topics}
 
-For each topic, answer YES if the article clearly matches, NO otherwise.
 Output ONLY a JSON object:
 ```json
 {{"hit": true, "topic": "topic name that matched"}}
 ```
 or if no match:
 ```json
-{{"hit": false}}
+{{"hit": false, "topic": ""}}
 ```"""
 
 
-def call_deepseek(prompt: str, system: str = "You are a helpful assistant.", max_tokens: int = 4096) -> Tuple[Optional[str], Optional[dict]]:
+def _init_client():
+    global _client, _provider
+    if _client is not None:
+        return
+
+    from config import DEEPSEEK_API_KEY
+
+    # Try Google Gemini first
+
+    google_key = DEEPSEEK_API_KEY  # We're reusing the config key name for now; check if it looks like a Google key
+    # Actually, check for separate env var
+    import os
+    google_key = os.getenv("GOOGLE_API_KEY", "")
+    if not google_key:
+        google_key = os.getenv("GEMINI_API_KEY", "")
+
+    if google_key:
+        try:
+            from google import genai
+            _client = genai.Client(api_key=google_key)
+            _provider = "gemini"
+            logger.info("AI: Using Google Gemini")
+            return
+        except ImportError:
+            logger.warning("google-genai not installed, falling back to DeepSeek")
+
+    # Fall back to DeepSeek
+    deepseek_key = os.getenv("DEEPSEEK_API_KEY", "")
+    if deepseek_key:
+        from openai import OpenAI
+        from config import DEEPSEEK_BASE_URL
+        _client = OpenAI(api_key=deepseek_key, base_url=DEEPSEEK_BASE_URL)
+        _provider = "deepseek"
+        logger.info("AI: Using DeepSeek")
+        return
+
+    logger.error("No AI provider configured. Set GOOGLE_API_KEY or DEEPSEEK_API_KEY.")
+
+
+def call_ai(prompt: str, system: str = "You are a helpful assistant.", max_tokens: int = 4096) -> Tuple[Optional[str], Optional[dict]]:
+    _init_client()
+
     try:
-        resp = _get_client().chat.completions.create(
-            model=DEEPSEEK_MODEL,
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user", "content": prompt},
-            ],
-            max_tokens=max_tokens,
-            temperature=0.3,
-        )
-        content = resp.choices[0].message.content.strip()
-        usage = {
-            "prompt_tokens": resp.usage.prompt_tokens,
-            "completion_tokens": resp.usage.completion_tokens,
-            "total_tokens": resp.usage.total_tokens,
-        }
+        if _provider == "gemini":
+            from google import genai
+            model = "gemini-2.5-flash"
+            response = _client.models.generate_content(
+                model=model,
+                contents=prompt,
+                config={
+                    'system_instruction': system,
+                    'max_output_tokens': max_tokens,
+                    'temperature': 0.3,
+                },
+            )
+            content = response.text.strip()
+            usage = {
+                "prompt_tokens": response.usage_metadata.prompt_token_count if hasattr(response, 'usage_metadata') and response.usage_metadata else 0,
+                "completion_tokens": response.usage_metadata.candidates_token_count if hasattr(response, 'usage_metadata') and response.usage_metadata else 0,
+                "total_tokens": response.usage_metadata.total_token_count if hasattr(response, 'usage_metadata') and response.usage_metadata else 0,
+            }
+        else:
+            from config import DEEPSEEK_MODEL
+            response = _client.chat.completions.create(
+                model=DEEPSEEK_MODEL,
+                messages=[
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": prompt},
+                ],
+                max_tokens=max_tokens,
+                temperature=0.3,
+            )
+            content = response.choices[0].message.content.strip()
+            usage = {
+                "prompt_tokens": response.usage.prompt_tokens,
+                "completion_tokens": response.usage.completion_tokens,
+                "total_tokens": response.usage.total_tokens,
+            }
         return content, usage
     except Exception as e:
-        logger.error(f"DeepSeek call failed: {e}")
+        logger.error(f"AI call failed: {e}")
         return None, None
 
 
@@ -150,14 +194,10 @@ def curate_articles(candidates: list, domains: dict) -> Optional[dict]:
     domain_rules = ""
     for d, cfg in domains.items():
         domain_rules += f"- {d}: aim for {cfg.get('min_articles', 0)}-{cfg.get('max_articles', 99)} articles\n"
-    domain_rules += "\nThese are SOFT constraints. If a domain's candidates are clearly weaker (quality <= 3/10), skip it and mention why in the domain_note."
+    domain_rules += "\nThese are SOFT constraints. If a domain's candidates are clearly weaker (quality <= 3/10), skip it and mention why."
 
-    prompt = CURATION_PROMPT.format(
-        candidates=candidates_text,
-        domain_rules=domain_rules,
-    )
-
-    result, usage = call_deepseek(prompt, system="You are a professional editor.", max_tokens=2048)
+    prompt = CURATION_PROMPT.format(candidates=candidates_text, domain_rules=domain_rules)
+    result, usage = call_ai(prompt, system="You are a professional editor.", max_tokens=2048)
     if not result:
         return None
 
@@ -174,14 +214,9 @@ def curate_articles(candidates: list, domains: dict) -> Optional[dict]:
 def translate_article(text: str) -> Tuple[Optional[str], Optional[dict]]:
     max_chunk = 8000
     if len(text) <= max_chunk:
-        result, usage = call_deepseek(
-            TRANSLATION_PROMPT.format(text=text),
-            system="You are a professional translator. Translate English to Chinese with high fidelity.",
-            max_tokens=8192,
-        )
+        result, usage = call_ai(text, system=TRANSLATION_SYSTEM, max_tokens=8192)
         return result, usage
 
-    # Chunked translation for long texts
     chunks = [text[i:i+max_chunk] for i in range(0, len(text), max_chunk)]
     translated = []
     total_usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
@@ -190,8 +225,8 @@ def translate_article(text: str) -> Tuple[Optional[str], Optional[dict]]:
         if context:
             chunk_prompt = f"Previous translation context:\n{context}\n\nContinue translating the following text:\n{chunk}"
         else:
-            chunk_prompt = TRANSLATION_PROMPT.format(text=chunk)
-        result, usage = call_deepseek(chunk_prompt, max_tokens=8192)
+            chunk_prompt = chunk
+        result, usage = call_ai(chunk_prompt, system=TRANSLATION_SYSTEM, max_tokens=8192)
         if not result:
             logger.error(f"Chunk {i+1}/{len(chunks)} translation failed")
             return None, None
@@ -203,7 +238,7 @@ def translate_article(text: str) -> Tuple[Optional[str], Optional[dict]]:
 
 
 def review_translation(translation: str, original_sample: str) -> Optional[dict]:
-    result, usage = call_deepseek(
+    result, usage = call_ai(
         REVIEW_PROMPT.format(original_sample=original_sample[:2000], translation=translation[:3000]),
         system="You are a translation quality reviewer.",
         max_tokens=512,
@@ -228,10 +263,9 @@ def generate_editor_note(articles_info: list, banned_words: list) -> str:
     prompt = EDITOR_NOTE_PROMPT.format(articles=articles_text)
 
     for attempt in range(3):
-        result, usage = call_deepseek(prompt, system="You are a magazine editor with strong opinions.", max_tokens=1024)
+        result, usage = call_ai(prompt, system="You are a magazine editor with strong opinions.", max_tokens=1024)
         if not result:
             continue
-        # Check banned words
         hit = False
         for w in banned_words:
             if w in result:
@@ -240,9 +274,8 @@ def generate_editor_note(articles_info: list, banned_words: list) -> str:
                 break
         if not hit:
             return result
-        prompt += f"\n\nRETRY REQUIREMENT: Completely avoid these words/phrases: {', '.join(banned_words)}"
+        prompt += f"\n\nRETRY: Completely avoid: {', '.join(banned_words)}"
 
-    # Use template fallback
     titles = [a['title_zh'] for a in articles_info]
     return f"今天的选文围绕几个共同议题展开：{'、'.join(titles[:3])}等。每篇都值得细读，希望有一篇能陪你度过此刻。"
 
@@ -255,7 +288,7 @@ def semantic_blacklist_check(title: str, excerpt: str, topics: list) -> Tuple[bo
         excerpt=excerpt[:500],
         topics="\n".join(f"- {t}" for t in topics),
     )
-    result, usage = call_deepseek(prompt, max_tokens=256)
+    result, usage = call_ai(prompt, max_tokens=256)
     if not result:
         return False, ""
     try:
