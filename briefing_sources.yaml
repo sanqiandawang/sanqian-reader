@@ -1,0 +1,14 @@
+# 三千要看 v2 — 早报短管线源
+sources:
+  - id: theverge
+    url: https://www.theverge.com/rss/index.xml
+    weight: 1.0
+  - id: arstechnica
+    url: https://feeds.arstechnica.com/arstechnica/index
+    weight: 1.0
+  - id: restofworld
+    url: https://restofworld.org/feed/
+    weight: 1.2
+  - id: hackernews_top
+    url: https://hnrss.org/frontpage?points=200
+    weight: 0.8
