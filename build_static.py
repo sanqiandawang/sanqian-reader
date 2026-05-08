@@ -31,7 +31,7 @@ h1{text-align:center;font-size:1.6em;margin-bottom:.2em}
 .article-header{margin-bottom:1.5em;border-bottom:1px solid #ccc;padding-bottom:.8em}
 .article-header h1{font-size:1.4em;margin-bottom:.2em}
 .article-header .meta{color:#888;font-size:.85em}
-.pagination{margin:2em 0;text-align:center;font-size:.95em}
+.pagination{margin:2em 0;text-align:right;font-size:.85em;color:#888}
 .pagination a{padding:.3em .8em;text-decoration:none;color:#000;border:1px solid #ccc}
 .pagination span{padding:.3em .8em;color:#888}
 .nav-bottom{margin-top:2em;padding-top:1em;border-top:1px solid #eee;text-align:center;font-size:.95em}
@@ -232,7 +232,7 @@ def build_index(issue, today_str, section_meta):
             section_html += f"""<div class="article-item">
   <a href="{BASE}/articles/{aid_}/">
     <span class="title">{title}{spoiler_tag}</span>
-    <span class="meta">{source} | {wc} 字</span>
+    <span class="meta">{source} | 约 {max(1, wc//600)} 分钟</span>
     <span class="summary">{summary}</span>
   </a>
 </div>"""
@@ -339,14 +339,13 @@ def build_article_page(article, content_html, page, total, next_id):
     done_link = ""
     if is_last:
         done_link = '| <span class="done-link">已读完</span>'
-    cat = f'<pre class="cat-footer">{CAT_ART}</pre>'
 
     return f"""<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>{title} - 三千要看</title><style>{CSS}</style></head><body>
-<div class="article-header"><h1>{title}{spoiler_tag}</h1><div class="meta">{source} | {wc} 字</div></div>
+<div class="article-header"><h1>{title}{spoiler_tag}</h1><div class="meta">{source} | 约 {max(1, wc//600)} 分钟</div></div>
 <div class="content">{content_html}</div>
 <div class="pagination">{prev_link} <span>第 {page} / {total} 页</span> {next_link}</div>
 <div class="nav-bottom"><a href="{BASE}/">回首页</a> {done_link}</div>
-{cat}</body></html>"""
+</body></html>"""
 
 
 def build_archive(issues):

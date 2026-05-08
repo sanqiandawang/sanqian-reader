@@ -34,6 +34,32 @@ readability = ReadabilityProvider()
 TODAY = date.today().isoformat()
 
 
+def clean_translated_content(text: str) -> str:
+    """Post-process translated content: strip tracking params, escape underscores, convert links to footnotes."""
+    import re
+    # 1. Strip utm_*, fbclid, ref, source tracking params from URLs
+    text = re.sub(r'[?&](utm_[^&\s]+|fbclid=[^&\s]+|ref=[^&\s]+|source=[^&\s]+)', '', text)
+    # 2. Escape underscores in URLs to prevent markdown italic
+    def escape_url_underscores(m):
+        url = m.group(1)
+        return f'({url.replace("_", "\\_")})'
+    text = re.sub(r'\(([^)]*_[^)]*)\)', escape_url_underscores, text)
+    # 3. Convert [text](url) to footnotes
+    footnotes = []
+    def link_to_footnote(m):
+        link_text = m.group(1)
+        link_url = m.group(2).replace('\\_', '_')
+        idx = len(footnotes) + 1
+        footnotes.append((idx, link_url))
+        return f'{link_text}[^{idx}]'
+    text = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', link_to_footnote, text)
+    if footnotes:
+        text += '\n\n---\n'
+        for idx, url in footnotes:
+            text += f'\n[^{idx}]: {url}'
+    return text
+
+
 # ==================== Cache & Checkpoint Helpers ====================
 
 def cache_path(step: str) -> Path:
@@ -350,9 +376,9 @@ def step_translate(selected: list) -> list:
                     time.sleep(5)
                 if zh_text:
                     word_count_zh = len(zh_text.replace(" ", "").replace("\n", ""))
-                    c["content_zh"] = zh_text
+                    c["content_zh"] = clean_translated_content(zh_text)
                     c["word_count_zh"] = word_count_zh
-                    c["translation_model"] = "deepseek-chat"
+                    c["translation_model"] = "deepseek-v4-pro"
                     c["prompt_version"] = TRANSLATION_PROMPT_VERSION
                     c["usage"] = usage
                     translated.append(c)
@@ -403,8 +429,8 @@ def step_review(translated: list) -> list:
     for c in translated:
         demote_reasons = []
 
-        if c["word_count_zh"] < TRANSLATED_MIN_CHARS:
-            demote_reasons.append(f"word_count_zh={c['word_count_zh']} < {TRANSLATED_MIN_CHARS}")
+        if c["word_count_zh"] < 800:
+            demote_reasons.append(f"word_count_zh={c['word_count_zh']} < 800")
 
         original_sample = c["text_en"][:2000]
         scores = review_translation(c["content_zh"], original_sample)
