@@ -169,12 +169,14 @@ def markdown_to_html(text: str) -> str:
             if not in_list or list_type != 'ul':
                 if in_list: result.append(f'</{list_type}>')
                 result.append('<ul>'); in_list = True; list_type = 'ul'
-            result.append(f'<li>{_inline(re.sub(r"^[-*+]\s", "", s))}</li>')
+            item_text = re.sub(r'^[-*+]\s', '', s)
+            result.append(f'<li>{_inline(item_text)}</li>')
         elif re.match(r'^\d+\.\s', s):
             if not in_list or list_type != 'ol':
                 if in_list: result.append(f'</{list_type}>')
                 result.append('<ol>'); in_list = True; list_type = 'ol'
-            result.append(f'<li>{_inline(re.sub(r"^\d+\.\s", "", s))}</li>')
+            item_text = re.sub(r'^\d+\.\s', '', s)
+            result.append(f'<li>{_inline(item_text)}</li>')
         else:
             if in_list: result.append(f'</{list_type}>'); in_list = False; list_type = None
             result.append(f'<p>{_inline(s)}</p>')
