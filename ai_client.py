@@ -396,6 +396,12 @@ def generate_briefing(entries: list) -> dict:
         json_match = re.search(r'```json\s*(.*?)\s*```', result, re.DOTALL)
         if json_match:
             result = json_match.group(1)
+        else:
+            # Fallback: find first { to last }
+            start = result.find('{')
+            end = result.rfind('}')
+            if start >= 0 and end > start:
+                result = result[start:end+1]
         return json.loads(result)
     except json.JSONDecodeError:
         logger.error(f"Briefing JSON parse failed: {result[:200]}")
