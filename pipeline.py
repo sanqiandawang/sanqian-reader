@@ -42,7 +42,8 @@ def clean_translated_content(text: str) -> str:
     # 2. Escape underscores in URLs to prevent markdown italic
     def escape_url_underscores(m):
         url = m.group(1)
-        return f'({url.replace("_", "\\_")})'
+        escaped = url.replace("_", "\\_")
+        return f'({escaped})'
     text = re.sub(r'\(([^)]*_[^)]*)\)', escape_url_underscores, text)
     # 3. Convert [text](url) to footnotes
     footnotes = []
