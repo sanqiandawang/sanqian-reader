@@ -18,6 +18,9 @@ class Article:
     translation_model: str = ""
     prompt_version: str = ""
     quality_score: dict = field(default_factory=dict)
+    section_id: str = ""
+    has_spoiler: bool = False
+    topic_keywords: list[str] = field(default_factory=list)
     read_status: str = "unread"
     read_at: Optional[str] = None
     fetched_at: Optional[str] = None
@@ -52,10 +55,10 @@ class CandidateArticle:
     id: str
     url: str
     source_name: str
-    source_domain: str
     title_en: str
     text_en: str
     word_count: int
+    source_id: str = ""
     published_at: Optional[str] = None
     author: str = ""
 

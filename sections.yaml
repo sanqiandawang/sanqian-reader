@@ -1,0 +1,54 @@
+# 三千要看 v2 — 栏目位定义
+# 每期每个栏目位选 1 篇，宁缺毋滥
+
+sections:
+  crime:
+    name: "罪案"
+    emoji: "🔍"
+    description: "真实犯罪、卧底调查、骗局、悬案、法律纠纷叙事；虚构罪案小说节选/书评亦可"
+    items_per_issue: 1
+    min_chars_zh: 2500
+    sources: [longreads, the_atlantic, the_new_yorker, guardian_long]
+    selection_hints:
+      prefer: ["叙事张力强", "人物鲜活", "有反转或悬念", "卧底/调查/法庭/欺诈"]
+      avoid: ["纯案件综述", "过度学术化的犯罪学分析"]
+
+  screen:
+    name: "光影"
+    emoji: "🎬"
+    description: "电影/动画评论、导演访谈、影史回顾、流媒体推荐、动画产业故事"
+    items_per_issue: 1
+    min_chars_zh: 1800
+    sources: [the_atlantic, the_new_yorker, polygon, anime_news_network]
+    selection_hints:
+      prefer: ["有明确观点", "推荐价值高", "新片或被低估老片", "动画/作者电影"]
+      avoid: ["票房新闻", "流水账采访"]
+    spoiler_check: true
+
+  society:
+    name: "切片"
+    emoji: "🌍"
+    description: "社会非虚构，主题不限。优先拓宽视野的视角而非纯粹深度"
+    items_per_issue: 1
+    min_chars_zh: 3000
+    sources: [the_atlantic, guardian_long, the_new_yorker, aeon]
+    selection_hints:
+      prefer: ["视角新颖", "故事性强", "国际或跨文化议题"]
+      avoid: ["美国国内政治选举评论", "纯学术综述", "已成共识的旧话题"]
+
+  wildcard:
+    name: "今日意外"
+    emoji: "🎲"
+    description: "前三栏放不下、但读起来有趣的文章。科学怪谈、个人散文、商业故事、文化考古、技术历史、游戏文化等"
+    items_per_issue: 1
+    min_chars_zh: 1500
+    sources: ALL
+    selection_hints:
+      prefer: ["主题罕见", "读后能讲给别人听", "和今日其他三篇风格反差大"]
+      avoid: ["和 crime/screen/society 主题重复"]
+    rule: "must_differ_from_other_sections"
+
+global:
+  total_longreads_per_issue: 4
+  allow_section_skip: true
+  skip_min_remaining: 2

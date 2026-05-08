@@ -10,27 +10,36 @@ logger = logging.getLogger("ai")
 _client = None
 _provider = None  # "gemini" or "deepseek"
 
-CURATION_PROMPT = """You are a professional editor curating today's recommended reads from English long-form articles.
+SECTION_EDITOR_PROMPT = """你是「三千要看」的{section_emoji}{section_name}栏目编辑。
 
-Candidate articles (each with ID, source, domain, title, opening 300-char excerpt, mid-article 300-char excerpt, word count):
+栏目定位：{description}
+偏好特征：{prefer_hints}
+避免特征：{avoid_hints}
 
-{candidates}
+以下是今日候选（已通过基础筛选，每篇附开头摘要）：
+{candidates_with_summary}
 
-Domain diversity (soft constraint — prioritize but skip if quality is too low):
-{domain_rules}
+**选稿优先级**:
+1. 有趣性：读者愿意一口气读完
+2. 易读性：故事/观点清晰，不需要专业背景就能进入
+3. 深度：在前两条满足前提下加分项，不是必要条件
 
-Selection criteria: breadth of coverage, depth, novelty. Do not pick all from the same topic.
+请选出最合适的 1 篇，或在确实没有合适候选时返回 null。
 
-Domain diversity is a SOFT constraint. Prioritize it, but if a domain's candidates are clearly weaker, skip it.
-
-Output ONLY a JSON object with selected article IDs (5-8), reasons, and domain coverage note:
-```json
+输出 JSON：
 {{
-  "selected": ["id1", "id2"],
-  "reasons": {{"id1": "Why this article was selected", "id2": "..."}},
-  "domain_note": "thought: 3 articles, science: 2, gaming_anime: 2."
-}}
-```"""
+  "selected_id": "候选ID或null",
+  "reason": "30字内说明为什么选它（或为什么跳过）",
+  "topic_keywords": ["关键词1", "关键词2", "关键词3"]
+}}"""
+
+SPOILER_CHECK_PROMPT = """以下是一篇影评的中文译文。判断它是否包含影响观影体验的关键剧情披露（结局反转、角色死亡、谜底揭晓、关键转折）。
+
+只输出 JSON：
+{{"has_spoiler": true/false, "type": "结局/转折/人物命运/无"}}
+
+译文：
+{translated_text}"""
 
 TRANSLATION_PROMPT_VERSION = "v2"
 
@@ -270,3 +279,118 @@ def semantic_blacklist_check(title: str, excerpt: str, topics: list) -> Tuple[bo
         return data.get("hit", False), data.get("topic", "")
     except json.JSONDecodeError:
         return False, ""
+
+
+def pick_for_section(section_cfg: dict, candidates: list, used_topics: list = None) -> dict:
+    """Select 1 article for a section. Returns {selected_candidate, reason, topic_keywords} or None."""
+    if used_topics is None:
+        used_topics = []
+
+    # Build candidate summary text
+    candidates_text = ""
+    for c in candidates:
+        excerpt = c.get("text_en", "")[:300]
+        candidates_text += (
+            f"ID: {c['id']}\n"
+            f"来源: {c['source_name']}\n"
+            f"标题: {c['title_en']}\n"
+            f"开头摘要: {excerpt}\n"
+            f"字数: {c['word_count']}\n\n"
+        )
+
+    prompt = SECTION_EDITOR_PROMPT.format(
+        section_emoji=section_cfg.get("emoji", ""),
+        section_name=section_cfg.get("name", ""),
+        description=section_cfg.get("description", ""),
+        prefer_hints=", ".join(section_cfg.get("selection_hints", {}).get("prefer", [])),
+        avoid_hints=", ".join(section_cfg.get("selection_hints", {}).get("avoid", [])),
+        candidates_with_summary=candidates_text,
+    )
+
+    result, usage = call_ai(prompt, max_tokens=1024)
+    if not result:
+        return None
+
+    try:
+        json_match = re.search(r'```json\s*(.*?)\s*```', result, re.DOTALL)
+        if json_match:
+            result = json_match.group(1)
+        data = json.loads(result)
+        selected_id = data.get("selected_id")
+        if not selected_id or selected_id == "null":
+            return None
+        # Find the candidate
+        for c in candidates:
+            if c["id"] == selected_id:
+                c["curation_reason"] = data.get("reason", "")
+                c["topic_keywords"] = data.get("topic_keywords", [])
+                c["section_id"] = section_cfg.get("id", "")
+                return c
+        return None
+    except json.JSONDecodeError:
+        logger.error(f"Section pick JSON parse failed: {result[:200]}")
+        return None
+
+
+def spoiler_check(translated_text: str) -> dict:
+    """Check if a film review contains spoilers. Returns {has_spoiler, type}."""
+    if len(translated_text) < 500:
+        return {"has_spoiler": False, "type": "无"}
+
+    prompt = SPOILER_CHECK_PROMPT.format(translated_text=translated_text[:4000])
+    result, usage = call_ai(prompt, max_tokens=256)
+    if not result:
+        return {"has_spoiler": False, "type": "无"}
+
+    try:
+        json_match = re.search(r'```json\s*(.*?)\s*```', result, re.DOTALL)
+        if json_match:
+            result = json_match.group(1)
+        return json.loads(result)
+    except json.JSONDecodeError:
+        return {"has_spoiler": False, "type": "无"}
+
+
+def generate_briefing(entries: list) -> dict:
+    """Generate 8-10 Chinese briefing items from RSS entries. Returns {items: [...]}."""
+    entries_text = ""
+    for i, e in enumerate(entries[:30]):
+        entries_text += f"[{i}] {e['title']}\n   摘要: {e.get('summary', '')[:150]}\n   来源: {e['source_name']} | {e.get('url', '')}\n\n"
+
+    prompt = f"""你是科技与国际事件早报编辑。以下是过去24小时的候选条目（已去重）。
+
+请精选 8-10 条最值得知晓的信息，每条用 100-200 个中文字写成短讯，要求：
+
+1. 第一句话直接给结论或核心事实，不要"据报道""有消息称"开头
+2. 如果是科技产品/政策/事件，写清楚"谁、做了什么、影响是什么"
+3. 不写情绪化评价，但可以点出反常之处或值得追问的点
+4. 跨地域优先：相同重要性下，优先选非美国本土的事件
+5. 排除：纯融资新闻、人事变动（除非 CEO 级且是知名公司）、产品小版本更新
+
+输出 JSON 格式：
+{{
+  "items": [
+    {{
+      "title": "短讯一句话标题（不超过 30 字）",
+      "body": "100-200 字短讯正文",
+      "source_url": "原文链接",
+      "source_name": "源名称"
+    }}
+  ]
+}}
+
+候选条目（共 {len(entries[:30])} 条）：
+{entries_text}"""
+
+    result, usage = call_ai(prompt, max_tokens=4096)
+    if not result:
+        return {"items": []}
+
+    try:
+        json_match = re.search(r'```json\s*(.*?)\s*```', result, re.DOTALL)
+        if json_match:
+            result = json_match.group(1)
+        return json.loads(result)
+    except json.JSONDecodeError:
+        logger.error(f"Briefing JSON parse failed: {result[:200]}")
+        return {"items": []}

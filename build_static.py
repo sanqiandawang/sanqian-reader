@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-"""Generate static HTML site from pipeline data for GitHub Pages."""
+"""Generate static HTML site from pipeline data for GitHub Pages — v2 section-based."""
 import json
 import re
+import yaml
 from pathlib import Path
 from datetime import date
 
 ROOT = Path(__file__).parent
 SITE = ROOT / "site"
 DATA = ROOT / "data"
-BASE = "/sanqian-reader"  # GitHub Pages repo name
+BASE = "/sanqian-reader"
 
 CSS = """body{max-width:720px;margin:0 auto;padding:24px 18px;background:#fff;color:#000;font-size:18px;line-height:1.6;font-family:serif}
 h1{text-align:center;font-size:1.6em;margin-bottom:.2em}
@@ -42,7 +43,18 @@ h1{text-align:center;font-size:1.6em;margin-bottom:.2em}
 .issue-note{color:#555;font-size:.9em;margin-bottom:.5em;line-height:1.5}
 .issue a{text-decoration:none;color:#000}
 .issue ul{list-style:none;padding:0;margin:0}
-.issue li{padding:.2em 0;font-size:.95em}"""
+.issue li{padding:.2em 0;font-size:.95em}
+.section-card{margin:1.5em 0;padding:1em;border:1px solid #ddd;border-radius:2px}
+.section-card h2{font-size:1.1em;margin:0 0 .8em 0;padding-bottom:.4em;border-bottom:1px solid #eee}
+.section-card .article-item:last-child{border-bottom:none}
+.spoiler-tag{display:inline-block;padding:0 .4em;border:1px solid #c00;color:#c00;font-size:.85em;margin-left:.5em}
+.briefing{margin-bottom:2em;padding:1em;border:1px solid #000}
+.briefing h2{margin-top:0}
+.briefing ol{padding-left:1.5em}
+.briefing li{margin-bottom:1em}
+.briefing h3{font-size:1em;margin:0 0 .3em 0}
+.briefing p{margin:.3em 0;line-height:1.6}
+.briefing small{color:#666}"""
 
 CAT_ART = """      ／l、
     （ﾟ､ ｡ ７
@@ -50,6 +62,19 @@ CAT_ART = """      ／l、
       じしf_,)ノ"""
 
 PAGE_CHARS = 2000
+
+
+def load_section_meta():
+    """Load section emoji and name mapping from sections.yaml."""
+    sec_file = ROOT / "sections.yaml"
+    if not sec_file.exists():
+        return {}
+    with open(sec_file) as f:
+        data = yaml.safe_load(f)
+    meta = {}
+    for sid, cfg in data.get("sections", {}).items():
+        meta[sid] = {"name": cfg["name"], "emoji": cfg["emoji"]}
+    return meta
 
 
 def markdown_to_html(text: str) -> str:
@@ -72,42 +97,28 @@ def markdown_to_html(text: str) -> str:
         if not s:
             if in_list:
                 result.append(f'</{list_type}>')
-                in_list = False
-                list_type = None
+                in_list = False; list_type = None
             result.append('')
             continue
-        if s.startswith('### '):
-            result.append(f'<h3>{_inline(s[4:])}</h3>')
-        elif s.startswith('## '):
-            result.append(f'<h3>{_inline(s[3:])}</h3>')
-        elif s.startswith('# '):
-            result.append(f'<h2>{_inline(s[2:])}</h2>')
-        elif s.startswith('> '):
-            result.append(f'<blockquote>{_inline(s[2:])}</blockquote>')
-        elif s in ('---', '***', '___'):
-            result.append('<hr>')
+        if s.startswith('### '): result.append(f'<h3>{_inline(s[4:])}</h3>')
+        elif s.startswith('## '): result.append(f'<h3>{_inline(s[3:])}</h3>')
+        elif s.startswith('# '): result.append(f'<h2>{_inline(s[2:])}</h2>')
+        elif s.startswith('> '): result.append(f'<blockquote>{_inline(s[2:])}</blockquote>')
+        elif s in ('---', '***', '___'): result.append('<hr>')
         elif re.match(r'^[-*+]\s', s):
             if not in_list or list_type != 'ul':
                 if in_list: result.append(f'</{list_type}>')
-                result.append('<ul>')
-                in_list = True; list_type = 'ul'
-            item = re.sub(r'^[-*+]\s', '', s)
-            result.append(f'<li>{_inline(item)}</li>')
+                result.append('<ul>'); in_list = True; list_type = 'ul'
+            result.append(f'<li>{_inline(re.sub(r"^[-*+]\s", "", s))}</li>')
         elif re.match(r'^\d+\.\s', s):
             if not in_list or list_type != 'ol':
                 if in_list: result.append(f'</{list_type}>')
-                result.append('<ol>')
-                in_list = True; list_type = 'ol'
-            item = re.sub(r'^\d+\.\s', '', s)
-            result.append(f'<li>{_inline(item)}</li>')
+                result.append('<ol>'); in_list = True; list_type = 'ol'
+            result.append(f'<li>{_inline(re.sub(r"^\d+\.\s", "", s))}</li>')
         else:
-            if in_list:
-                result.append(f'</{list_type}>')
-                in_list = False; list_type = None
+            if in_list: result.append(f'</{list_type}>'); in_list = False; list_type = None
             result.append(f'<p>{_inline(s)}</p>')
-
-    if in_list:
-        result.append(f'</{list_type}>')
+    if in_list: result.append(f'</{list_type}>')
     return '\n'.join(result)
 
 
@@ -117,26 +128,16 @@ def paginate_html(html: str, chars_per_page: int = PAGE_CHARS) -> list:
     i = 0
     while i < len(blocks):
         if i + 1 < len(blocks) and re.match(r'</(?:p|h[234]|blockquote|li|ul|ol)>\s*', blocks[i+1]):
-            paragraphs.append(blocks[i] + blocks[i+1])
-            i += 2
-        elif blocks[i].strip():
-            paragraphs.append(blocks[i])
-            i += 1
-        else:
-            i += 1
-    pages = []
-    current = []
-    current_len = 0
+            paragraphs.append(blocks[i] + blocks[i+1]); i += 2
+        elif blocks[i].strip(): paragraphs.append(blocks[i]); i += 1
+        else: i += 1
+    pages, current, current_len = [], [], 0
     for p in paragraphs:
         visible = len(re.sub(r'<[^>]+>', '', p))
         if current_len + visible > chars_per_page and current:
-            pages.append('\n'.join(current))
-            current = []
-            current_len = 0
-        current.append(p)
-        current_len += visible
-    if current:
-        pages.append('\n'.join(current))
+            pages.append('\n'.join(current)); current = []; current_len = 0
+        current.append(p); current_len += visible
+    if current: pages.append('\n'.join(current))
     return pages or ['']
 
 
@@ -154,11 +155,10 @@ def build():
 
     today_str = date.today().isoformat()
     latest_issue = issues[0] if issues else None
+    section_meta = load_section_meta()
 
-    # === index.html ===
-    (SITE / "index.html").write_text(build_index(latest_issue, today_str))
+    (SITE / "index.html").write_text(build_index(latest_issue, today_str, section_meta))
 
-    # === Article pages ===
     articles_dir = DATA / "articles"
     if latest_issue:
         for aid in latest_issue.get("articles", []):
@@ -175,56 +175,88 @@ def build():
                 ids = latest_issue.get("articles", [])
                 try:
                     idx = ids.index(aid)
-                    if idx + 1 < len(ids):
-                        next_id = ids[idx + 1]
-                except ValueError:
-                    pass
+                    if idx + 1 < len(ids): next_id = ids[idx + 1]
+                except ValueError: pass
                 page_file = article_dir / f"page{pi}.html" if pi > 1 else article_dir / "index.html"
                 page_file.write_text(build_article_page(article, page_html, pi, len(pages), next_id))
 
-    # === archive.html ===
     (SITE / "archive.html").write_text(build_archive(issues))
-
     print(f"Static site built: {len(list(SITE.rglob('*.html')))} pages")
 
 
-def build_index(issue, today_str):
+def build_index(issue, today_str, section_meta):
     if not issue:
         return f"""<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>三千要看</title><style>{CSS}</style></head><body>
 <h1>三千要看</h1><div class="date">{today_str}</div>
 <pre class="cat-art">{CAT_ART}</pre>
-<p style="text-align:center;color:#888;margin-top:2em">今天还没有内容，稍后回来看看。</p>
+<p style="text-align:center;color:#888;margin-top:2em">今天还没有内容，一会回来看看。</p>
 <div class="footer"><a href="{BASE}/archive.html">往期</a></div>
 </body></html>"""
 
     articles_dir = DATA / "articles"
-    items = ""
+
+    # Group articles by section
+    articles_by_section = {}
     for aid in issue.get("articles", []):
         ajson = articles_dir / f"{aid}.json"
         if not ajson.exists():
             continue
         a = json.loads(ajson.read_text())
-        title = a.get("title_zh") or aid
-        source = a.get("source", "")
-        wc = a.get("word_count_zh", 0)
-        summary = a.get("summary_zh", "")
-        items += f"""<li class="article-item">
-  <a href="{BASE}/articles/{aid}/">
-    <span class="title">{title}</span>
+        sid = a.get("section_id", "unknown")
+        if sid not in articles_by_section:
+            articles_by_section[sid] = []
+        articles_by_section[sid].append(a)
+
+    section_html = ""
+    for sid, articles in articles_by_section.items():
+        meta = section_meta.get(sid, {"name": sid, "emoji": ""})
+        section_html += f'<section class="section-card"><h2>{meta["emoji"]} {meta["name"]}</h2>'
+        for a in articles:
+            title = a.get("title_zh") or a.get("id", "")
+            source = a.get("source", "")
+            wc = a.get("word_count_zh", 0)
+            summary = a.get("summary_zh", "")
+            aid_ = a.get("id", "")
+            spoiler_tag = '<span class="spoiler-tag">[剧透]</span>' if a.get("has_spoiler") else ""
+            section_html += f"""<div class="article-item">
+  <a href="{BASE}/articles/{aid_}/">
+    <span class="title">{title}{spoiler_tag}</span>
     <span class="meta">{source} | {wc} 字</span>
     <span class="summary">{summary}</span>
   </a>
-</li>"""
+</div>"""
+        section_html += '</section>'
+
+    if not articles_by_section:
+        section_html = '<p style="text-align:center;color:#888">本期暂无长文。</p>'
 
     fb = issue.get("stats", {}).get("fallback_note", "")
     fb_html = f'<p style="color:#c00;text-align:center">{fb}</p>' if fb else ""
 
-    return f"""<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>三千要看 — {issue["_date"]}</title><style>{CSS}</style></head><body>
+    # Check for briefing
+    briefing_html = ""
+    briefing_file = DATA / "briefings" / f"{issue['_date']}.json"
+    if briefing_file.exists():
+        try:
+            briefing_data = json.loads(briefing_file.read_text())
+            items_html = ""
+            for item in briefing_data.get("items", [])[:10]:
+                items_html += f"""<li>
+  <h3><a href="{item.get('source_url', '#')}">{item.get('title', '')}</a></h3>
+  <p>{item.get('body', '')}</p>
+  <small>- {item.get('source_name', '')}</small>
+</li>"""
+            briefing_html = f'<section class="briefing"><h2>📰 今日要闻</h2><ol>{items_html}</ol></section>'
+        except Exception:
+            pass
+
+    return f"""<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>三千要看 - {issue["_date"]}</title><style>{CSS}</style></head><body>
 <h1>三千要看</h1><div class="date">{issue["_date"]}</div>
 <pre class="cat-art">{CAT_ART}</pre>
+{briefing_html}
 <div class="editor-note">{issue.get("editor_note", "")}</div>
 {fb_html}
-<ul class="article-list">{items}</ul>
+{section_html}
 <div class="footer"><a href="{BASE}/archive.html">往期</a></div>
 </body></html>"""
 
@@ -233,29 +265,23 @@ def build_article_page(article, content_html, page, total, next_id):
     title = article.get("title_zh") or article.get("id", "")
     source = article.get("source", "")
     wc = article.get("word_count_zh", 0)
+    spoiler_tag = '<span class="spoiler-tag">[剧透]</span>' if article.get("has_spoiler") else ""
 
     prev_link = ""
     if page > 1:
         prev_url = f"page{page-1}.html" if page > 2 else ""
         prev_link = f'<a href="{prev_url}">上一页</a>'
-
     next_link = ""
     if page < total:
-        next_url = f"page{page+1}.html"
-        next_link = f'<a href="{next_url}">下一页</a>'
-
+        next_link = f'<a href="page{page+1}.html">下一页</a>'
     is_last = page == total
     done_link = ""
     if is_last:
-        if next_id:
-            done_link = f'| <a class="done-link" href="{BASE}/articles/{next_id}/">下一篇</a>'
-        else:
-            done_link = '| <span class="done-link">已读完 ✓</span>'
-
+        done_link = '| <span class="done-link">已读完</span>'
     cat = f'<pre class="cat-footer">{CAT_ART}</pre>'
 
-    return f"""<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>{title} — 三千要看</title><style>{CSS}</style></head><body>
-<div class="article-header"><h1>{title}</h1><div class="meta">{source} | {wc} 字</div></div>
+    return f"""<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>{title} - 三千要看</title><style>{CSS}</style></head><body>
+<div class="article-header"><h1>{title}{spoiler_tag}</h1><div class="meta">{source} | {wc} 字</div></div>
 <div class="content">{content_html}</div>
 <div class="pagination">{prev_link} <span>第 {page} / {total} 页</span> {next_link}</div>
 <div class="nav-bottom"><a href="{BASE}/">回首页</a> {done_link}</div>
@@ -266,8 +292,7 @@ def build_archive(issues):
     items = ""
     for iss in issues:
         note = iss.get("editor_note", "")
-        if len(note) > 120:
-            note = note[:120] + "..."
+        if len(note) > 120: note = note[:120] + "..."
         links = ""
         for aid in iss.get("articles", []):
             links += f'<li><a href="{BASE}/articles/{aid}/">{aid}</a></li>'
@@ -276,11 +301,9 @@ def build_archive(issues):
 <div class="issue-note">{note}</div>
 <ul>{links}</ul>
 </div>"""
-
     if not items:
         items = '<p style="text-align:center;color:#888">还没有往期内容。</p>'
-
-    return f"""<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>往期 — 三千要看</title><style>{CSS}</style></head><body>
+    return f"""<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>往期 - 三千要看</title><style>{CSS}</style></head><body>
 <h1>往期</h1>
 {items}
 <div class="footer"><a href="{BASE}/">回首页</a></div>

@@ -53,5 +53,6 @@ EDITOR_BANNED_WORDS = [
 
 # Sources file
 SOURCES_FILE = ROOT / "sources.yaml"
+SECTIONS_FILE = ROOT / "sections.yaml"
 BLACKLIST_FILE = ROOT / "blacklist.txt"
 BLACKLIST_TOPICS_FILE = ROOT / "blacklist_topics.txt"

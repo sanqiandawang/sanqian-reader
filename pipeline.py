@@ -177,7 +177,7 @@ def step_fetch() -> list:
             "id": article_id,
             "url": url,
             "source_name": entry["source_name"],
-            "source_domain": entry["source_domain"],
+            "source_id": entry.get("source_id", ""),
             "title_en": metadata.title,
             "text_en": text,
             "word_count": metadata.word_count,
@@ -228,14 +228,18 @@ def step_screen(candidates: list) -> list:
     return passed
 
 
-# ==================== Step 3: Curate ====================
+# ==================== Step 3: Curate (v2 section-based) ====================
 
-def _extract_mid_sample(text: str, sample_chars: int = 300) -> str:
-    if len(text) <= sample_chars * 2:
-        return text
-    mid = len(text) // 2
-    start = max(0, mid - sample_chars // 2)
-    return text[start:start + sample_chars]
+def _load_sections() -> list:
+    import yaml
+    from config import SECTIONS_FILE
+    with open(SECTIONS_FILE) as f:
+        data = yaml.safe_load(f)
+    sections = data.get("sections", {})
+    # Inject section id into each section dict
+    for sid, cfg in sections.items():
+        cfg["id"] = sid
+    return sections
 
 
 def step_curate(passed: list) -> list:
@@ -244,51 +248,68 @@ def step_curate(passed: list) -> list:
         logger.info("Step 3: Using cached curation results")
         return cached.get("selected", [])
 
-    if len(passed) <= 5:
-        logger.info(f"Step 3: Only {len(passed)} candidates, skipping curation")
-        result = {"selected": passed}
-        save_cache("curate", result)
-        return passed
+    logger.info(f"Step 3: Curating {len(passed)} candidates into sections...")
+    sections = _load_sections()
+    from ai_client import pick_for_section
 
-    logger.info(f"Step 3: Curating from {len(passed)} candidates...")
+    selected = []
+    used_ids = set()
+    section_results = {}  # {section_id: candidate}
 
-    for c in passed:
-        text = c["text_en"]
-        c["text_head"] = text[:300]
-        c["text_mid"] = _extract_mid_sample(text, 300)
+    for section_id, cfg in sections.items():
+        if section_id == "wildcard":
+            continue  # Do wildcard last
 
-    from ai_client import curate_articles
-    from providers.rss_feed import load_domains, load_sources
+        eligible = [
+            c for c in passed
+            if c.get("source_id") in cfg.get("sources", [])
+            and c["id"] not in used_ids
+        ]
 
-    domains = load_domains()
-    curation_result = curate_articles(passed, domains)
+        if not eligible:
+            logger.info(f"  [{section_id}] 无合适候选，跳过")
+            continue
 
-    if not curation_result:
-        logger.warning("Curation failed, falling back to weight-based selection")
-        sources = {s["name"]: s for s in load_sources()}
-        scored = []
-        for c in passed:
-            weight = sources.get(c["source_name"], {}).get("weight", 1)
-            scored.append((weight * c["word_count"] / 1000, c))
-        scored.sort(reverse=True)
-        selected = [s[1] for s in scored[:8]]
-    else:
-        selected_ids = set(curation_result.get("selected", []))
-        selected = [c for c in passed if c["id"] in selected_ids]
-        reasons = curation_result.get("reasons", {})
+        # Limit candidate pool to 8, weighted by source weight
+        from providers.rss_feed import load_sources as _ls
+        sources = {s["source_id"]: s for s in _ls()}
+        if len(eligible) > 8:
+            scored = [(sources.get(c.get("source_id", ""), {}).get("weight", 1), c) for c in eligible]
+            scored.sort(reverse=True, key=lambda x: x[0])
+            eligible = [s[1] for s in scored[:8]]
+
+        logger.info(f"  [{section_id}] {cfg['emoji']}{cfg['name']}: {len(eligible)} eligible")
+        result = pick_for_section(cfg, eligible)
+        if result:
+            result["section_id"] = section_id
+            selected.append(result)
+            used_ids.add(result["id"])
+            section_results[section_id] = result
+            logger.info(f"    -> {result['title_en'][:50]}")
+
+    # Wildcard: pick from remaining, avoiding topic overlap
+    wildcard_cfg = sections.get("wildcard")
+    if wildcard_cfg:
+        used_topics = []
         for c in selected:
-            c["curation_reason"] = reasons.get(c["id"], "")
+            used_topics.extend(c.get("topic_keywords", []))
+        remaining = [c for c in passed if c["id"] not in used_ids]
+        if remaining:
+            if len(remaining) > 8:
+                random.shuffle(remaining)
+                remaining = remaining[:8]
+            logger.info(f"  [wildcard] {wildcard_cfg['emoji']}{wildcard_cfg['name']}: {len(remaining)} remaining")
+            result = pick_for_section(wildcard_cfg, remaining)
+            if result:
+                result["section_id"] = "wildcard"
+                selected.append(result)
+                section_results["wildcard"] = result
+                logger.info(f"    -> {result['title_en'][:50]}")
 
-    if len(selected) < 5:
-        selected_ids = {c["id"] for c in selected}
-        remaining = [c for c in passed if c["id"] not in selected_ids]
-        random.shuffle(remaining)
-        selected.extend(remaining[:5 - len(selected)])
-
-    result = {"selected": selected[:8]}
+    result = {"selected": selected, "sections": section_results}
     save_cache("curate", result)
-    logger.info(f"Step 3 done: {len(selected[:8])} articles selected")
-    return selected[:8]
+    logger.info(f"Step 3 done: {len(selected)} articles across {len(section_results)} sections")
+    return selected
 
 
 # ==================== Step 4: Translate ====================
@@ -401,6 +422,14 @@ def step_review(translated: list) -> list:
             c["quality_score"] = {"terms": 5, "fluency": 5, "completeness": 5, "note": "review_failed"}
             logger.warning(f"  Review call failed for {c['title_en'][:40]}")
 
+        # Spoiler check for screen section
+        if c.get("section_id") == "screen":
+            from ai_client import spoiler_check
+            spoiler = spoiler_check(c["content_zh"])
+            c["has_spoiler"] = spoiler.get("has_spoiler", False)
+            if c["has_spoiler"]:
+                logger.info(f"  SPOILER [{spoiler.get('type', '?')}] {c['title_en'][:40]}")
+
         if demote_reasons:
             c["demote_reasons"] = demote_reasons
             demoted.append(c)
@@ -478,11 +507,6 @@ def step_publish(approved: list, send_epub_flag: bool = True) -> Optional[dict]:
     editor_note = generate_editor_note(articles_info, EDITOR_BANNED_WORDS)
 
     # Build issue
-    source_dist = {}
-    for a in final_articles:
-        src = a.get("source_name", "unknown")
-        source_dist[src] = source_dist.get(src, 0) + 1
-
     issue = {
         "date": TODAY,
         "articles": [a["id"] for a in final_articles],
@@ -490,7 +514,7 @@ def step_publish(approved: list, send_epub_flag: bool = True) -> Optional[dict]:
         "stats": {
             "total_articles": len(final_articles),
             "fallback_note": fallback_note,
-            "source_distribution": source_dist,
+            "section_distribution": {c.get("section_id", "unknown"): c.get("source_name", "") for c in final_articles},
         },
     }
 
@@ -537,7 +561,10 @@ def step_publish(approved: list, send_epub_flag: bool = True) -> Optional[dict]:
             "prompt_version": a.get("prompt_version", ""),
             "quality_score": a.get("quality_score", {}),
             "fetched_at": a.get("fetched_at", datetime.now().isoformat()),
-            "tags": [a.get("source_domain", "")],
+            "tags": a.get("topic_keywords", [a.get("source_id", "")]),
+            "section_id": a.get("section_id", ""),
+            "has_spoiler": a.get("has_spoiler", False),
+            "topic_keywords": a.get("topic_keywords", []),
         }
         insert_article(article_data)
     insert_issue(issue)
@@ -678,12 +705,8 @@ def _write_daily_log(issue: dict, articles: list, epub_sent: bool):
         f"  Articles: {len(articles)}",
         f"  EPUB sent: {epub_sent}",
         f"  Editor note: {issue['editor_note'][:80]}...",
-        f"  Sources: {issue['stats']['source_distribution']}",
-        f"  Candidate->Selected conversion:",
+        f"  Sections: {issue['stats'].get('section_distribution', {})}",
     ]
-    for src, count in issue["stats"]["source_distribution"].items():
-        lines.append(f"    {src}: {count} selected")
-    lines.append("")
     with open(log_file, "a") as f:
         f.write("\n".join(lines) + "\n")
 

@@ -40,7 +40,10 @@ def _init_schema(conn):
             quality_score TEXT NOT NULL DEFAULT '{}',
             read_status TEXT NOT NULL DEFAULT 'unread',
             read_at TEXT,
-            fetched_at TEXT NOT NULL DEFAULT ''
+            fetched_at TEXT NOT NULL DEFAULT '',
+            section_id TEXT NOT NULL DEFAULT '',
+            has_spoiler INTEGER NOT NULL DEFAULT 0,
+            topic_keywords TEXT NOT NULL DEFAULT '[]'
         );
 
         CREATE TABLE IF NOT EXISTS issues (
@@ -59,6 +62,16 @@ def _init_schema(conn):
             INSERT INTO articles_fts(rowid, title_zh) VALUES (new.rowid, new.title_zh);
         END;
     """)
+    # Idempotent ALTER TABLE for v2 columns (existing DBs)
+    for col, col_def in [
+        ("section_id", "TEXT NOT NULL DEFAULT ''"),
+        ("has_spoiler", "INTEGER NOT NULL DEFAULT 0"),
+        ("topic_keywords", "TEXT NOT NULL DEFAULT '[]'"),
+    ]:
+        try:
+            conn.execute(f"ALTER TABLE articles ADD COLUMN {col} {col_def}")
+        except sqlite3.OperationalError:
+            pass  # column already exists
     conn.commit()
 
 
@@ -73,10 +86,12 @@ def insert_article(article: dict):
         INSERT OR REPLACE INTO articles
         (id, title_zh, source, source_url, author, summary_zh, tags,
          word_count_zh, original_word_count, translation_model, prompt_version,
-         quality_score, read_status, read_at, fetched_at)
+         quality_score, section_id, has_spoiler, topic_keywords,
+         read_status, read_at, fetched_at)
         VALUES (:id, :title_zh, :source, :source_url, :author, :summary_zh, :tags,
                 :word_count_zh, :original_word_count, :translation_model, :prompt_version,
-                :quality_score, :read_status, :read_at, :fetched_at)
+                :quality_score, :section_id, :has_spoiler, :topic_keywords,
+                :read_status, :read_at, :fetched_at)
     """, {
         "id": article["id"],
         "title_zh": article.get("title_zh", ""),
@@ -90,6 +105,9 @@ def insert_article(article: dict):
         "translation_model": article.get("translation_model", ""),
         "prompt_version": article.get("prompt_version", ""),
         "quality_score": json.dumps(article.get("quality_score", {})),
+        "section_id": article.get("section_id", ""),
+        "has_spoiler": 1 if article.get("has_spoiler") else 0,
+        "topic_keywords": json.dumps(article.get("topic_keywords", [])),
         "read_status": article.get("read_status", "unread"),
         "read_at": article.get("read_at"),
         "fetched_at": article.get("fetched_at", ""),

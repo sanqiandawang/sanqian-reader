@@ -1,23 +1,20 @@
-sources:
-  - { name: "Aeon", domain: "thought", weight: 5, rss: "https://aeon.co/feed.rss" }
-  - { name: "The Atlantic", domain: "thought", weight: 5, rss: "https://feeds.feedburner.com/TheAtlantic" }
-  - { name: "The New Yorker", domain: "thought", weight: 4, rss: "https://www.newyorker.com/feed/everything" }
-  - { name: "The Guardian Long Read", domain: "thought", weight: 4, rss: "https://www.theguardian.com/news/series/the-long-read/rss" }
-  - { name: "Longreads", domain: "thought", weight: 3, rss: "https://longreads.com/feed/" }
-  - { name: "Nautilus", domain: "science", weight: 3, rss: "https://nautil.us/feed/" }
-  - { name: "Quanta Magazine", domain: "science", weight: 3, rss: "https://www.quantamagazine.org/feed/" }
-  - { name: "Anime News Network", domain: "gaming_anime", weight: 3, rss: "https://www.animenewsnetwork.com/all/rss.xml" }
-  - { name: "Kotaku", domain: "gaming_anime", weight: 3, rss: "https://kotaku.com/rss" }
-  - { name: "Polygon", domain: "gaming_anime", weight: 3, rss: "https://www.polygon.com/rss/index.xml" }
-  - { name: "Rock Paper Shotgun", domain: "gaming_anime", weight: 2, rss: "https://www.rockpapershotgun.com/feed/" }
+# 三千要看 v2 — RSS 源定义
+# source_id 用于 sections.yaml 跨引用
 
-domains:
-  thought:
-    min_articles: 2
-    max_articles: 5
-  science:
-    min_articles: 1
-    max_articles: 2
-  gaming_anime:
-    min_articles: 1
-    max_articles: 3
+sources:
+  # 思想/文化
+  - { source_id: aeon, name: "Aeon", weight: 5, rss: "https://aeon.co/feed.rss" }
+  - { source_id: the_atlantic, name: "The Atlantic", weight: 5, rss: "https://feeds.feedburner.com/TheAtlantic" }
+  - { source_id: the_new_yorker, name: "The New Yorker", weight: 4, rss: "https://www.newyorker.com/feed/everything" }
+  - { source_id: guardian_long, name: "The Guardian Long Read", weight: 4, rss: "https://www.theguardian.com/news/series/the-long-read/rss" }
+  - { source_id: longreads, name: "Longreads", weight: 3, rss: "https://longreads.com/feed/" }
+
+  # 科学
+  - { source_id: nautilus, name: "Nautilus", weight: 3, rss: "https://nautil.us/feed/" }
+  - { source_id: quanta, name: "Quanta Magazine", weight: 3, rss: "https://www.quantamagazine.org/feed/" }
+
+  # 游戏/动漫
+  - { source_id: anime_news_network, name: "Anime News Network", weight: 3, rss: "https://www.animenewsnetwork.com/all/rss.xml" }
+  - { source_id: kotaku, name: "Kotaku", weight: 3, rss: "https://kotaku.com/rss" }
+  - { source_id: polygon, name: "Polygon", weight: 3, rss: "https://www.polygon.com/rss/index.xml" }
+  - { source_id: rock_paper_shotgun, name: "Rock Paper Shotgun", weight: 2, rss: "https://www.rockpapershotgun.com/feed/" }
