@@ -24,6 +24,7 @@ def fetch_briefing_entries() -> list:
 
     cutoff = datetime.now() - timedelta(hours=24)
     all_entries = []
+    failed_sources = []
 
     for src in sources:
         try:
@@ -56,6 +57,7 @@ def fetch_briefing_entries() -> list:
             logger.info(f"Briefing RSS {src['id']}: {len(feed.entries)} entries")
         except Exception as e:
             logger.error(f"Briefing fetch failed for {src['id']}: {e}")
+            failed_sources.append(src['id'])
 
     # Deduplicate by GUID
     seen_guids = set()
@@ -68,14 +70,14 @@ def fetch_briefing_entries() -> list:
     # Sort by weight * recency
     deduped.sort(key=lambda e: e["weight"], reverse=True)
     logger.info(f"Briefing: {len(deduped)} unique entries after dedup")
-    return deduped
+    return deduped, failed_sources
 
 
 def run_briefing():
     today_str = date.today().isoformat()
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-    entries = fetch_briefing_entries()
+    entries, failed_sources = fetch_briefing_entries()
     if not entries:
         logger.warning("No briefing entries found, skipping")
         return None
@@ -85,7 +87,15 @@ def run_briefing():
 
     if not result or not result.get("items"):
         logger.warning("Briefing generation returned empty")
+        # Save with warnings even if empty
+        if failed_sources:
+            result = {"items": [], "_warnings": [f"早报源连接失败: {', '.join(failed_sources)}"]}
+            output_path = DATA_DIR / f"{today_str}.json"
+            output_path.write_text(json.dumps(result, ensure_ascii=False, indent=2))
         return None
+
+    if failed_sources:
+        result["_warnings"] = [f"早报源连接失败: {', '.join(failed_sources)}"]
 
     # Save
     output_path = DATA_DIR / f"{today_str}.json"

@@ -85,7 +85,8 @@ CSS = """body{max-width:720px;margin:0 auto;padding:48px 24px 64px;background:#f
 .cat-btn .cat-art{display:none}
 .cat-btn .cat-label{color:inherit}
 #push-status{margin-top:8px;font-size:.72em;color:#bbb;line-height:1.5}
-.push-hint{font-size:.65em;color:#ddd;margin-top:4px}"""
+.push-hint{font-size:.65em;color:#ddd;margin-top:4px}
+.briefing-warn{font-size:.72em;color:#e80;margin-bottom:12px}"""
 
 CAT_ART = """      ／l、
     （ﾟ､ ｡ ７
@@ -292,7 +293,11 @@ def build_index(issue, today_str, section_meta):
   <p>{item.get('body', '')}</p>
   <small>- {item.get('source_name', '')}</small>
 </li>"""
-            briefing_html = f'<section class="briefing"><h2>今日要闻</h2><ol>{items_html}</ol></section>'
+            warning_html = ""
+            if briefing_data.get("_warnings"):
+                for w in briefing_data["_warnings"]:
+                    warning_html += f'<p class="briefing-warn">{w}</p>'
+            briefing_html = f'<section class="briefing"><h2>今日要闻</h2>{warning_html}<ol>{items_html}</ol></section>'
         except Exception:
             pass
 
@@ -313,6 +318,15 @@ async function triggerPush() {{
     token = prompt('请输入 GitHub Personal Access Token（仅存本机）：');
     if (!token) return;
     localStorage.setItem('gh_push_token', token);
+    localStorage.setItem('gh_push_token_created_at', new Date().toISOString());
+  }}
+  // PAT expiry check (>11 months)
+  const createdAt = localStorage.getItem('gh_push_token_created_at');
+  if (createdAt) {{
+    const ageMonths = (Date.now() - new Date(createdAt).getTime()) / (1000*60*60*24*30);
+    if (ageMonths > 11) {{
+      status.innerHTML = '<span style="color:#e80">⚠ Token 可能已过期（超过11个月），请重新生成</span>';
+    }}
   }}
   btn.disabled = true;
   status.textContent = '小猫正在出门送信...';

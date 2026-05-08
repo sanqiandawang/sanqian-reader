@@ -124,26 +124,30 @@ def _init_client():
     logger.error("No AI provider configured. Set DEEPSEEK_API_KEY.")
 
 
-def call_ai(prompt: str, system: str = "You are a helpful assistant.", max_tokens: int = 4096) -> Tuple[Optional[str], Optional[dict]]:
+def call_ai(prompt: str, system: str = "You are a helpful assistant.", max_tokens: int = 4096, json_mode: bool = False) -> Tuple[Optional[str], Optional[dict]]:
     _init_client()
 
     try:
         import requests as req
         url = f"{_client['base_url']}/chat/completions"
+        body = {
+            "model": "deepseek-v4-pro",
+            "messages": [
+                {"role": "system", "content": system + (" Respond with valid JSON only." if json_mode else "")},
+                {"role": "user", "content": prompt},
+            ],
+            "max_tokens": max_tokens,
+            "temperature": 0.3,
+        }
+        if json_mode:
+            body["response_format"] = {"type": "json_object"}
         resp = req.post(
             url,
             headers={
                 "Authorization": f"Bearer {_client['api_key']}",
                 "Content-Type": "application/json",
             },
-            json={
-                "model": "deepseek-v4-pro",
-                "messages": [
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": prompt},
-                ],
-                "max_tokens": max_tokens,
-                "temperature": 0.3,
+            json=body,
             },
             timeout=120,
         )
@@ -225,7 +229,7 @@ def review_translation(translation: str, original_sample: str) -> Optional[dict]
     result, usage = call_ai(
         REVIEW_PROMPT.format(original_sample=original_sample[:2000], translation=translation[:3000]),
         system="You are a translation quality reviewer.",
-        max_tokens=512,
+        max_tokens=512, json_mode=True,
     )
     if not result:
         return None
@@ -272,13 +276,10 @@ def semantic_blacklist_check(title: str, excerpt: str, topics: list) -> Tuple[bo
         excerpt=excerpt[:500],
         topics="\n".join(f"- {t}" for t in topics),
     )
-    result, usage = call_ai(prompt, max_tokens=256)
+    result, usage = call_ai(prompt, max_tokens=256, json_mode=True)
     if not result:
         return False, ""
     try:
-        json_match = re.search(r'```json\s*(.*?)\s*```', result, re.DOTALL)
-        if json_match:
-            result = json_match.group(1)
         data = json.loads(result)
         return data.get("hit", False), data.get("topic", "")
     except json.JSONDecodeError:
@@ -311,14 +312,11 @@ def pick_for_section(section_cfg: dict, candidates: list, used_topics: list = No
         candidates_with_summary=candidates_text,
     )
 
-    result, usage = call_ai(prompt, max_tokens=1024)
+    result, usage = call_ai(prompt, max_tokens=1024, json_mode=True)
     if not result:
         return None
 
     try:
-        json_match = re.search(r'```json\s*(.*?)\s*```', result, re.DOTALL)
-        if json_match:
-            result = json_match.group(1)
         data = json.loads(result)
         selected_id = data.get("selected_id")
         if not selected_id or selected_id == "null":
@@ -342,14 +340,11 @@ def spoiler_check(translated_text: str) -> dict:
         return {"has_spoiler": False, "type": "无"}
 
     prompt = SPOILER_CHECK_PROMPT.format(translated_text=translated_text[:4000])
-    result, usage = call_ai(prompt, max_tokens=256)
+    result, usage = call_ai(prompt, max_tokens=256, json_mode=True)
     if not result:
         return {"has_spoiler": False, "type": "无"}
 
     try:
-        json_match = re.search(r'```json\s*(.*?)\s*```', result, re.DOTALL)
-        if json_match:
-            result = json_match.group(1)
         return json.loads(result)
     except json.JSONDecodeError:
         return {"has_spoiler": False, "type": "无"}
@@ -386,20 +381,11 @@ def generate_briefing(entries: list) -> dict:
 候选条目（共 {len(entries[:30])} 条）：
 {entries_text}"""
 
-    result, usage = call_ai(prompt, max_tokens=4096)
+    result, usage = call_ai(prompt, max_tokens=4096, json_mode=True)
     if not result:
         return {"items": []}
 
     try:
-        json_match = re.search(r'```json\s*(.*?)\s*```', result, re.DOTALL)
-        if json_match:
-            result = json_match.group(1)
-        else:
-            # Fallback: find first { to last }
-            start = result.find('{')
-            end = result.rfind('}')
-            if start >= 0 and end > start:
-                result = result[start:end+1]
         return json.loads(result)
     except json.JSONDecodeError:
         logger.error(f"Briefing JSON parse failed: {result[:200]}")
