@@ -11,65 +11,91 @@ SITE = ROOT / "site"
 DATA = ROOT / "data"
 BASE = "/sanqian-reader"
 
-CSS = """body{max-width:720px;margin:0 auto;padding:24px 18px;background:#fff;color:#000;font-size:18px;line-height:1.6;font-family:serif}
-h1{text-align:center;font-size:1.6em;margin-bottom:.2em}
-.date{text-align:center;color:#888;font-size:.9em;margin-bottom:1.5em}
-.editor-note{border-left:3px solid #333;padding:.8em 1.2em;margin:1.5em 0;background:#fafafa;font-size:.95em;line-height:1.7}
-.article-list{list-style:none;padding:0}
-.article-item{padding:1em 0;border-bottom:1px solid #eee}
-.article-item a{text-decoration:none;color:#000}
-.article-item .title{font-size:1.1em;font-weight:bold;display:block}
-.article-item .meta{color:#888;font-size:.85em;margin-top:.3em}
-.article-item .summary{color:#555;font-size:.9em;margin-top:.4em;line-height:1.5}
-.footer{text-align:center;margin-top:2em;font-size:.85em}
-.footer a{color:#888}
-.cat-art{text-align:center;color:#bbb;font-size:.7em;line-height:1.3;margin:1em 0;white-space:pre}
-.content{line-height:1.8}
-.content p{text-indent:2em;margin:.4em 0}
-.content h2,.content h3{margin:1.2em 0 .4em}
-.content blockquote{border-left:3px solid #ccc;padding:.3em 1em;margin:.5em 0;color:#555}
-.article-header{margin-bottom:1.5em;border-bottom:1px solid #ccc;padding-bottom:.8em}
-.article-header h1{font-size:1.4em;margin-bottom:.2em}
-.article-header .meta{color:#888;font-size:.85em}
-.pagination{margin:2em 0;text-align:right;font-size:.85em;color:#888}
-.pagination a{padding:.3em .8em;text-decoration:none;color:#000;border:1px solid #ccc}
-.pagination span{padding:.3em .8em;color:#888}
-.nav-bottom{margin-top:2em;padding-top:1em;border-top:1px solid #eee;text-align:center;font-size:.95em}
-.nav-bottom a{text-decoration:none;color:#000;padding:.3em .8em;border:1px solid #ccc}
-.done-link{color:#888;font-size:.85em}
-.cat-footer{text-align:center;color:#ddd;font-size:.55em;line-height:1.2;margin:3em 0 1em;white-space:pre}
-.issue{margin-bottom:2em}
-.issue-date{font-size:1.1em;font-weight:bold;border-bottom:1px solid #ccc;padding-bottom:.3em;margin-bottom:.5em}
-.issue-note{color:#555;font-size:.9em;margin-bottom:.5em;line-height:1.5}
-.issue a{text-decoration:none;color:#000}
-.issue ul{list-style:none;padding:0;margin:0}
-.issue li{padding:.2em 0;font-size:.95em}
-.section-card{margin:1.5em 0;padding:1em;border:1px solid #ddd}
-.section-card h2{font-size:1.1em;margin:0 0 .8em 0;padding-bottom:.4em;border-bottom:1px solid #eee}
+CSS = """body{max-width:720px;margin:0 auto;padding:48px 24px 64px;background:#fff;color:#1a1a1a;font-size:17px;line-height:1.65;font-family:"Noto Serif CJK SC",Georgia,"Times New Roman",serif;-webkit-font-smoothing:antialiased}
+@media(max-width:600px){body{padding:32px 16px 56px;font-size:16px}}
+
+/* Content-first: subtle date top */
+.date-top{text-align:center;color:#bbb;font-size:.78em;letter-spacing:.1em;margin-bottom:40px}
+
+/* Editorial note */
+.editor-note{border-left:3px solid #e0e0dc;padding:.6em 1.2em;margin:0 0 40px;background:#fafaf8;font-size:.9em;line-height:1.75;color:#666}
+
+/* Section cards */
+.section-card{margin:0 0 40px;padding:0}
+.section-card h2{font-size:.78em;font-weight:400;color:#bbb;letter-spacing:.08em;margin-bottom:20px;padding-bottom:8px;border-bottom:1px solid #f0f0ec}
+.section-card .article-item{padding:14px 0;border-bottom:1px solid #f5f5f0}
 .section-card .article-item:last-child{border-bottom:none}
-.spoiler-tag{display:inline-block;padding:0 .4em;border:1px solid #c00;color:#c00;font-size:.85em;margin-left:.5em}
-.briefing{margin-bottom:2em;padding:1em;border:1px solid #000}
-.briefing h2{margin-top:0}
-.briefing ol{padding-left:1.5em}
-.briefing li{margin-bottom:1em}
-.briefing h3{font-size:1em;margin:0 0 .3em 0}
-.briefing p{margin:.3em 0;line-height:1.6}
-.briefing small{color:#666}
-.push-container{margin:2rem 0;text-align:center}
-.cat-btn{background:#fff;border:1.5px solid #1a1a1a;padding:1rem 2rem;cursor:pointer;font-family:inherit;display:inline-flex;flex-direction:column;align-items:center;gap:.5rem}
-.cat-btn .cat-art{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:.7rem;line-height:1.1;margin:0;white-space:pre}
-.cat-btn .cat-label{font-size:.9rem;letter-spacing:.05em}
-.cat-btn:hover:not(:disabled){background:#1a1a1a;color:#fff}
-.cat-btn:hover:not(:disabled) .cat-art,.cat-btn:hover:not(:disabled) .cat-label{color:#fff}
-.cat-btn:disabled{opacity:.5;cursor:not-allowed}
-#push-status{margin-top:1rem;font-size:.85rem;color:#666;line-height:1.5}
-#push-status a{color:#336}
-.push-hint{font-size:.72rem;color:#bbb;margin-top:.5rem;line-height:1.5}"""
+.section-card .article-item a{text-decoration:none;color:inherit;display:block}
+.section-card .title{font-size:1.08em;font-weight:600;line-height:1.45;display:block;margin-bottom:4px;color:#111}
+.section-card .meta{font-size:.75em;color:#bbb;display:block;margin-bottom:6px}
+.section-card .summary{font-size:.85em;color:#888;line-height:1.6;display:block}
+@media(max-width:600px){.section-card{margin-bottom:32px}.section-card .title{font-size:1em}}
+
+/* Article page */
+.article-header{margin-bottom:32px;padding-bottom:20px;border-bottom:1px solid #f0f0ec}
+.article-header h1{font-size:1.4em;font-weight:600;line-height:1.4;margin-bottom:8px}
+.article-header .meta{color:#bbb;font-size:.8em}
+.content{line-height:1.85}
+.content p{text-indent:2em;margin:.5em 0}
+.content h2,.content h3{margin:1.4em 0 .5em}
+.content blockquote{border-left:3px solid #e8e8e4;padding:.4em 1em;margin:.8em 0;color:#777}
+.content sup a{color:#888;text-decoration:none;font-size:.75em}
+.content sup a:hover{color:#333}
+.pagination{margin:2em 0;text-align:right;font-size:.85em;color:#999}
+.pagination a{padding:.3em .8em;text-decoration:none;color:#555;border:1px solid #e0e0dc}
+.pagination span{color:#bbb}
+.nav-bottom{margin-top:2em;padding-top:1em;border-top:1px solid #f0f0ec;text-align:center;font-size:.9em}
+.nav-bottom a{text-decoration:none;color:#555;margin:0 8px}
+.nav-bottom a:hover{color:#000}
+.done-link{color:#aaa;font-size:.85em}
+
+/* Spoiler tag */
+.spoiler-tag{display:inline-block;padding:0 5px;border:1px solid #c66;color:#c66;font-size:.78em;margin-left:6px;vertical-align:middle}
+
+/* Briefing card */
+.briefing{margin:0 0 40px;padding:0}
+.briefing h2{font-size:.78em;font-weight:400;color:#bbb;letter-spacing:.08em;margin-bottom:16px}
+.briefing ol{list-style:none;padding:0}
+.briefing li{margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #f5f5f0}
+.briefing li:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.briefing h3{font-size:.95em;font-weight:600;line-height:1.45;margin:0 0 3px}
+.briefing h3 a{color:#111;text-decoration:none}
+.briefing p{font-size:.85em;color:#888;line-height:1.65;margin:0}
+.briefing small{font-size:.7em;color:#ccc}
+
+/* Archive */
+.issue{margin-bottom:28px}
+.issue-date{font-size:1em;font-weight:600;margin-bottom:4px}
+.issue-note{font-size:.85em;color:#888;margin-bottom:8px;line-height:1.6}
+.issue ul{list-style:none;padding:0}
+.issue li{padding:2px 0;font-size:.9em}
+.issue a{color:inherit;text-decoration:none}
+.issue a:hover{text-decoration:underline}
+
+/* Footer — compact branding */
+.site-footer{text-align:center;margin-top:64px;padding-top:32px;border-top:1px solid #f0f0ec}
+.footer-cat{text-align:center;color:#e0e0dc;font-size:.5em;line-height:1.15;margin:0 0 8px;white-space:pre}
+.slogan{font-size:.82em;color:#bbb;letter-spacing:.06em;margin-bottom:12px}
+.footer-links{font-size:.75em;color:#ccc;margin-bottom:24px}
+.footer-links a{color:#bbb;text-decoration:none;margin:0 4px}
+.footer-links a:hover{color:#555}
+
+/* Push button in footer */
+.push-container{margin:0 auto;text-align:center}
+.cat-btn{display:inline-block;padding:6px 20px;background:none;border:1px solid #e0e0dc;cursor:pointer;font-family:inherit;font-size:.78em;color:#aaa;letter-spacing:.04em}
+.cat-btn:hover:not(:disabled){border-color:#888;color:#555}
+.cat-btn:disabled{opacity:.3;cursor:not-allowed}
+.cat-btn .cat-art{display:none}
+.cat-btn .cat-label{color:inherit}
+#push-status{margin-top:8px;font-size:.72em;color:#bbb;line-height:1.5}
+.push-hint{font-size:.65em;color:#ddd;margin-top:4px}"""
 
 CAT_ART = """      ／l、
     （ﾟ､ ｡ ７
       l  ~ヽ
       じしf_,)ノ"""
+
+SLOGAN = "三千万象，一猫读尽"
 
 PAGE_CHARS = 2000
 
@@ -197,11 +223,118 @@ def build():
 
 
 def build_index(issue, today_str, section_meta):
+    # Footer block reused in all pages
+    footer_block = f"""<div class="site-footer">
+<pre class="footer-cat">{CAT_ART}</pre>
+<div class="slogan">{SLOGAN}</div>
+<div class="footer-links"><a href="{BASE}/">首页</a> · <a href="{BASE}/archive.html">往期</a></div>
+<div class="push-container">
+  <button id="push-btn" class="cat-btn" onclick="triggerPush()">
+    <span class="cat-label">推送到 Kindle</span>
+  </button>
+  <div id="push-status"></div>
+  <div class="push-hint">Token 仅存本机</div>
+</div>
+</div>"""
+
     if not issue:
         return f"""<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>三千要看</title><style>{CSS}</style></head><body>
-<h1>三千要看</h1><div class="date">{today_str}</div>
-<p style="text-align:center;color:#999;margin-top:2em">今天还没有内容，一会回来看看。</p>
-<div class="footer"><a href="{BASE}/archive.html">往期</a></div>
+<div class="date-top">{today_str}</div>
+<p style="text-align:center;color:#999;margin-top:3em">今天还没有内容，一会回来看看。</p>
+{footer_block}
+</body></html>"""
+
+    articles_dir = DATA / "articles"
+
+    articles_by_section = {}
+    for aid in issue.get("articles", []):
+        ajson = articles_dir / f"{aid}.json"
+        if not ajson.exists():
+            continue
+        a = json.loads(ajson.read_text())
+        sid = a.get("section_id", "unknown")
+        if sid not in articles_by_section:
+            articles_by_section[sid] = []
+        articles_by_section[sid].append(a)
+
+    section_html = ""
+    for sid, articles in articles_by_section.items():
+        meta = section_meta.get(sid, {"name": sid, "emoji": ""})
+        section_html += f'<section class="section-card"><h2>{meta["emoji"]} {meta["name"]}</h2>'
+        for a in articles:
+            title = a.get("title_zh") or a.get("id", "")
+            source = a.get("source", "")
+            wc = a.get("word_count_zh", 0)
+            summary = a.get("summary_zh", "")
+            aid_ = a.get("id", "")
+            spoiler_tag = '<span class="spoiler-tag">[剧透]</span>' if a.get("has_spoiler") else ""
+            section_html += f"""<div class="article-item">
+  <a href="{BASE}/articles/{aid_}/">
+    <span class="title">{title}{spoiler_tag}</span>
+    <span class="meta">{source} | 约 {max(1, wc//600)} 分钟</span>
+    <span class="summary">{summary}</span>
+  </a>
+</div>"""
+        section_html += '</section>'
+
+    if not articles_by_section:
+        section_html = '<p style="text-align:center;color:#999">本期暂无长文。</p>'
+
+    fb = issue.get("stats", {}).get("fallback_note", "")
+    fb_html = f'<p style="color:#c00;text-align:center">{fb}</p>' if fb else ""
+
+    briefing_html = ""
+    briefing_file = DATA / "briefings" / f"{issue['_date']}.json"
+    if briefing_file.exists():
+        try:
+            briefing_data = json.loads(briefing_file.read_text())
+            items_html = ""
+            for item in briefing_data.get("items", [])[:10]:
+                items_html += f"""<li>
+  <h3><a href="{item.get('source_url', '#')}">{item.get('title', '')}</a></h3>
+  <p>{item.get('body', '')}</p>
+  <small>- {item.get('source_name', '')}</small>
+</li>"""
+            briefing_html = f'<section class="briefing"><h2>今日要闻</h2><ol>{items_html}</ol></section>'
+        except Exception:
+            pass
+
+    return f"""<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>三千要看 - {issue["_date"]}</title><style>{CSS}</style></head><body>
+<div class="date-top">{issue["_date"]}</div>
+{briefing_html}
+<div class="editor-note">{issue.get("editor_note", "")}</div>
+{fb_html}
+{section_html}
+{footer_block}
+<script>
+const ISSUE_DATE = "{issue['_date']}";
+async function triggerPush() {{
+  const btn = document.getElementById('push-btn');
+  const status = document.getElementById('push-status');
+  let token = localStorage.getItem('gh_push_token');
+  if (!token) {{
+    token = prompt('请输入 GitHub Personal Access Token（仅存本机）：');
+    if (!token) return;
+    localStorage.setItem('gh_push_token', token);
+  }}
+  btn.disabled = true;
+  status.textContent = '发送中...';
+  try {{
+    const resp = await fetch(
+      'https://api.github.com/repos/sanqiandawang/sanqian-reader/actions/workflows/manual_push.yml/dispatches',
+      {{ method:'POST', headers:{{ 'Accept':'application/vnd.github+json','Authorization':`Bearer ${{token}}`,'X-GitHub-Api-Version':'2022-11-28' }}, body:JSON.stringify({{ ref:'main', inputs:{{ issue_date:ISSUE_DATE }} }}) }}
+    );
+    if (resp.status === 204) {{
+      status.innerHTML = '✓ 已发送，2-3 分钟后到 Kindle';
+    }} else if (resp.status === 401) {{
+      status.textContent = 'Token 无效，已清除';
+      localStorage.removeItem('gh_push_token'); btn.disabled = false;
+    }} else {{
+      status.textContent = '发送失败: ' + resp.status; btn.disabled = false;
+    }}
+  }} catch(e) {{ status.textContent = '网络错误'; btn.disabled = false; }}
+}}
+</script>
 </body></html>"""
 
     articles_dir = DATA / "articles"
