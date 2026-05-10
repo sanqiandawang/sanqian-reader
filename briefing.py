@@ -78,26 +78,34 @@ def run_briefing():
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
     entries, failed_sources = fetch_briefing_entries()
+
+    warnings = []
+    if failed_sources:
+        warnings.append(f"早报源连接失败: {', '.join(failed_sources)}")
+
     if not entries:
-        logger.warning("No briefing entries found, skipping")
-        return None
+        logger.warning("No briefing entries found, saving empty briefing")
+        result = {"items": [], "_warnings": warnings} if warnings else {"items": []}
+        output_path = DATA_DIR / f"{today_str}.json"
+        output_path.write_text(json.dumps(result, ensure_ascii=False, indent=2))
+        return result
 
     from ai_client import generate_briefing
     result = generate_briefing(entries)
 
     if not result or not result.get("items"):
         logger.warning("Briefing generation returned empty")
-        # Save with warnings even if empty
-        if failed_sources:
-            result = {"items": [], "_warnings": [f"早报源连接失败: {', '.join(failed_sources)}"]}
-            output_path = DATA_DIR / f"{today_str}.json"
-            output_path.write_text(json.dumps(result, ensure_ascii=False, indent=2))
-        return None
+        if warnings:
+            result = {"items": [], "_warnings": warnings}
+        else:
+            result = {"items": [], "_warnings": ["AI 早报生成未返回有效内容"]}
+        output_path = DATA_DIR / f"{today_str}.json"
+        output_path.write_text(json.dumps(result, ensure_ascii=False, indent=2))
+        return result
 
-    if failed_sources:
-        result["_warnings"] = [f"早报源连接失败: {', '.join(failed_sources)}"]
+    if warnings:
+        result["_warnings"] = warnings
 
-    # Save
     output_path = DATA_DIR / f"{today_str}.json"
     output_path.write_text(json.dumps(result, ensure_ascii=False, indent=2))
     logger.info(f"Briefing saved: {output_path} ({len(result['items'])} items)")

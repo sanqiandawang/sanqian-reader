@@ -288,18 +288,25 @@ def build_index(issue, today_str, section_meta):
     if briefing_file.exists():
         try:
             briefing_data = json.loads(briefing_file.read_text())
-            items_html = ""
-            for item in briefing_data.get("items", [])[:10]:
-                items_html += f"""<li>
+            items = briefing_data.get("items", [])
+            if items:
+                items_html = ""
+                for item in items[:10]:
+                    items_html += f"""<li>
   <h3><a href="{item.get('source_url', '#')}">{item.get('title', '')}</a></h3>
   <p>{item.get('body', '')}</p>
   <small>- {item.get('source_name', '')}</small>
 </li>"""
-            warning_html = ""
-            if briefing_data.get("_warnings"):
-                for w in briefing_data["_warnings"]:
-                    warning_html += f'<p class="briefing-warn">{w}</p>'
-            briefing_html = f'<section class="briefing"><h2>今日要闻</h2>{warning_html}<ol>{items_html}</ol></section>'
+                warning_html = ""
+                if briefing_data.get("_warnings"):
+                    for w in briefing_data["_warnings"]:
+                        warning_html += f'<p class="briefing-warn">{w}</p>'
+                briefing_html = f'<section class="briefing"><h2>今日要闻</h2>{warning_html}<ol>{items_html}</ol></section>'
+            else:
+                reason = "未知原因"
+                if briefing_data.get("_warnings"):
+                    reason = "; ".join(briefing_data["_warnings"])
+                briefing_html = f'<section class="briefing"><h2>今日要闻</h2><p class="briefing-warn">今日早报暂未生成（{reason}）</p></section>'
         except Exception:
             pass
 
@@ -397,14 +404,21 @@ async function triggerPush() {{
     if briefing_file.exists():
         try:
             briefing_data = json.loads(briefing_file.read_text())
-            items_html = ""
-            for item in briefing_data.get("items", [])[:10]:
-                items_html += f"""<li>
+            items = briefing_data.get("items", [])
+            if items:
+                items_html = ""
+                for item in items[:10]:
+                    items_html += f"""<li>
   <h3><a href="{item.get('source_url', '#')}">{item.get('title', '')}</a></h3>
   <p>{item.get('body', '')}</p>
   <small>- {item.get('source_name', '')}</small>
 </li>"""
-            briefing_html = f'<section class="briefing"><h2>📰 今日要闻</h2><ol>{items_html}</ol></section>'
+                briefing_html = f'<section class="briefing"><h2>📰 今日要闻</h2><ol>{items_html}</ol></section>'
+            else:
+                reason = "未知原因"
+                if briefing_data.get("_warnings"):
+                    reason = "; ".join(briefing_data["_warnings"])
+                briefing_html = f'<section class="briefing"><h2>📰 今日要闻</h2><p class="briefing-warn">今日早报暂未生成（{reason}）</p></section>'
         except Exception:
             pass
 

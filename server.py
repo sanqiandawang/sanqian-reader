@@ -280,7 +280,13 @@ async def refresh(token: str = Query(...)):
 
     def run():
         from pipeline import run_pipeline
-        run_pipeline(send_epub=True)
+        result = run_pipeline(send_epub=True)
+        if result:
+            try:
+                from briefing import run_briefing
+                run_briefing()
+            except Exception as e:
+                logger.warning(f"Briefing failed (non-blocking): {e}")
 
     thread = threading.Thread(target=run)
     thread.start()

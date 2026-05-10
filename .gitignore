@@ -2,7 +2,8 @@ venv/
 .env
 __pycache__/
 *.pyc
-data/index.db
+data/index.db-shm
+data/index.db-wal
 data/articles/
 data/issues/
 data/cache/
