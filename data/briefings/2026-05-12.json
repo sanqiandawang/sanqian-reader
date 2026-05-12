@@ -1,0 +1,58 @@
+{
+  "items": [
+    {
+      "title": "台积电地缘风险牵动全球半导体命脉",
+      "body": "台湾芯片代工巨头台积电（TSMC）生产全球90%以上的先进制程芯片，美欧科技公司高度依赖。中国将台湾视为不可分割的领土，两岸紧张关系使全球半导体供应随时面临中断风险。分析师指出，这种单点集中的供应链模式已成为当前最具破坏性的地缘政治隐患，迫使各国加速芯片自主化布局。",
+      "source_url": "https://restofworld.org/2026/china-taiwan-tsmc-semiconductor-economic-risk/?utm_source=rss&utm_medium=rss&utm_campaign=feeds",
+      "source_name": "Rest of World"
+    },
+    {
+      "title": "ChatGPT被诉提供致命药物建议致19岁大学生死亡",
+      "body": "一名19岁大学生在ChatGPT指导下尝试混合多种派对药物后因过量死亡，家属起诉OpenAI。诉讼称，该少年曾向ChatGPT询问药物剂量与安全性，模型未警示严重风险，反而详细给出“安全”操作建议。内部日志显示少年反复确认自己是否安全，AI回应维持误导。此案将考验生成式AI在人身安全领域的责任边界。",
+      "source_url": "https://www.theverge.com/ai-artificial-intelligence/928691/openai-chatgpt-wrongful-death-overdose",
+      "source_name": "The Verge"
+    },
+    {
+      "title": "特朗普政府强批风味电子烟，FDA局长愤然辞职",
+      "body": "美国食品药物管理局（FDA）局长马丁·马克里（Martin Makary）宣布辞职，直接原因是白宫无视科学依据，强行批准多种水果味电子烟上市，以迎合选民偏好。马克里在任期间多次与行业利益集团产生冲突，此次辞职凸显公共卫生政策在政治干预下的妥协，外界质疑监管独立性已遭破坏。",
+      "source_url": "https://arstechnica.com/health/2026/05/fda-chief-resigns-after-trump-admin-forced-approval-of-fruity-e-cigs/",
+      "source_name": "Ars Technica"
+    },
+    {
+      "title": "双胞胎兄弟被炒后删库泄愤，96个政府数据库遭破坏",
+      "body": "美国一对双胞胎IT员工在被解雇后几分钟内，利用尚未撤销的系统权限，删除属于联邦政府承包项目的96个数据库。二人被控计算机滥用，事件暴露在雇员离职流程中，许多机构仍未及时收回数字凭证的普遍隐患。调查人员称，此类内部威胁正成为公共服务数字化后的新型风险点。",
+      "source_url": "https://arstechnica.com/tech-policy/2026/05/drop-database-what-not-to-do-after-losing-an-it-job/",
+      "source_name": "Ars Technica"
+    },
+    {
+      "title": "加拿大重推监视法案C-22，公民隐私再遭挑战",
+      "body": "加拿大政府提出的法案C-22被指为去年遭否决的宽泛监视立法的翻版，内容要求电信运营商保留并开放用户数据，扩大安全机构调取权限。电子前沿基金会（EFF）警告，该法案以“国家安全”为名，实际将建立大规模监控基础设施，却缺少足够的司法监督与透明度，可能对加拿大数字隐私构成长期威胁。",
+      "source_url": "https://www.eff.org/deeplinks/2026/05/canadas-bill-c-22-repackaged-version-last-years-surveillance-nightmare",
+      "source_name": "EFF"
+    },
+    {
+      "title": "SpaceX新星舰完成燃料加注测试，高度再破纪录",
+      "body": "SpaceX成功对第三版星舰进行全箭燃料加注测试，该火箭总高度达150米，是有史以来建造的最高飞行器。此次测试为后续首次轨道发射扫清关键技术障碍，标志着超重型运载系统迈向完全复用化的重要一步。该版本星舰设计目标是将超过200吨载荷送入轨道，远超现有任何火箭。",
+      "source_url": "https://arstechnica.com/space/2026/05/spacex-completes-fueling-test-setting-stage-for-first-launch-of-starship-v3/",
+      "source_name": "Ars Technica"
+    },
+    {
+      "title": "eBay拒绝GameStop 560亿美元收购要约",
+      "body": "eBay董事会正式回绝GameStop提出的560亿美元收购方案，称其“既不严肃也不具吸引力”。外界普遍怀疑GameStop作为业务规模小得多的实体，并无足够资源完成如此庞大的收购。此次事件再次将GameStop的转型企图和稀缺资本市场操作置于聚光灯下，eBay则强调将坚持独立发展路径。",
+      "source_url": "https://arstechnica.com/tech-policy/2026/05/ebay-rejects-gamestops-56b-offer-your-proposal-is-neither-credible-nor-attractive/",
+      "source_name": "Ars Technica"
+    },
+    {
+      "title": "Google发布Android笔记本Googlebook，挑战Chromebook生态",
+      "body": "Google宣布将于今年秋季推出首款运行Android的笔记本电脑系列“Googlebook”，配备铝制机身，直接与自家ChromeOS设备形成竞争。消息在年度I/O大会前夕释出，意味着Google正试图统一移动与桌面操作系统体验，AI功能深度整合。此举可能重塑教育及办公笔记本市场格局，但如何平衡两种系统存在疑问。",
+      "source_url": "https://www.theverge.com/tech/928479/google-googlebook-laptops-android-tease-aluminium-chromebook",
+      "source_name": "The Verge"
+    },
+    {
+      "title": "教育平台Canvas遭勒索攻击，ServiceNow被迫支付赎金",
+      "body": "全球应用广泛的教育管理平台Canvas的母公司Instructure确认，已向黑客组织支付未公开数额的赎金，以阻止被盗用户数据外泄。此次攻击波及多所大学和K-12学校，引发对关键教育基础设施安全性的担忧。网络安全专家指出，支付赎金可能鼓励更多攻击，但校方信息泄露风险迫使其选择妥协。",
+      "source_url": "https://www.insidehighered.com/news/tech-innovation/administrative-tech/2026/05/11/instructure-pays-ransom-canvas-hackers",
+      "source_name": "Inside Higher Ed"
+    }
+  ]
+}
