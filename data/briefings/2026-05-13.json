@@ -1,0 +1,64 @@
+{
+  "items": [
+    {
+      "title": "中美峰会聚焦AI与芯片，科技供应链博弈升级",
+      "body": "中美领导人会晤将重点讨论人工智能竞争、芯片出口限制和电动汽车贸易。双方在关键技术领域的对抗与合作将影响全球半导体供应链格局，但能否达成实质性协议仍存变数。此次峰会成为观察科技地缘政治走向的关键窗口。",
+      "source_url": "https://restofworld.org/2026/trump-xi-meeting-tech/?utm_source=rss&utm_medium=rss&utm_campaign=feeds",
+      "source_name": "restofworld"
+    },
+    {
+      "title": "Meta推出“无痕聊天”，AI对话完全私密",
+      "body": "Meta CEO扎克伯格宣布推出加密的“无痕聊天”，这是首个不将对话日志存储在服务器的主流AI产品。用户与AI助手的互动将实现端到端加密，Meta自身也无法读取。这一功能可能迫使其他科技巨头跟进，同时也引发关于加密AI如何与内容监管共存的追问。",
+      "source_url": "https://www.theverge.com/tech/929791/meta-ai-incognito-chats",
+      "source_name": "theverge"
+    },
+    {
+      "title": "太阳能无人机破纪录后坠毁，极限技术面临考验",
+      "body": "一架翼展与大型客机相当的太阳能无人机在完成超长航时飞行后坠毁，虽创下纪录却以失败告终。该机设计用于高空伪卫星任务，事故暴露了此类超轻型飞行器在极端条件下的结构脆弱性，为追求耐久性敲响警钟。",
+      "source_url": "https://arstechnica.com/gadgets/2026/05/solar-drone-with-jumbo-jet-wingspan-broke-a-flight-record-then-it-crashed/",
+      "source_name": "arstechnica"
+    },
+    {
+      "title": "直立人牙齿蛋白揭示丹尼索瓦人血脉遗存",
+      "body": "研究人员在直立人牙釉质中检测到一种特殊蛋白质，此前仅在丹尼索瓦人和现代人中存在，表明古人类间基因交流比预想更为复杂。这一发现暗示丹尼索瓦人可能通过多次混血将DNA传入我们的祖先，改写了人类演化树。",
+      "source_url": "https://arstechnica.com/science/2026/05/protein-in-homo-erectus-teeth-suggests-denisovans-gave-us-some-of-their-dna/",
+      "source_name": "arstechnica"
+    },
+    {
+      "title": "NASA公布阿尔忒弥斯三号细节，悬而未决",
+      "body": "NASA披露了阿尔忒弥斯三号的部分任务概念，包括宇航员登月后的操作流程，但关键节点和预算方案仍不明确。重返月球计划在技术与资金双重压力下缓慢推进，外界质疑其能否在2020年代末实现载人着陆。",
+      "source_url": "https://arstechnica.com/space/2026/05/nasa-provides-some-details-about-artemis-iii-but-hard-decisions-remain/",
+      "source_name": "arstechnica"
+    },
+    {
+      "title": "美军兵推模拟轨道核爆，低轨瘫痪一年",
+      "body": "美国军方首次在一系列兵棋推演中模拟敌国在轨核引爆，结果显示爆炸产生的辐射和碎片将使近地轨道卫星失效长达一年。此举凸显太空军事化升级的极端后果，并可能推动国际社会加速太空军控谈判。",
+      "source_url": "https://arstechnica.com/space/2026/05/a-new-us-military-wargame-series-began-by-simulating-a-nuclear-weapon-in-orbit/",
+      "source_name": "arstechnica"
+    },
+    {
+      "title": "阿尔特曼被控“惯常说谎”，庭审陷胶着",
+      "body": "OpenAI首席执行官山姆·阿尔特曼在庭审中直面检方对其多次欺骗和篡权的指控，包括阻挠竞争对手等。阿尔特曼称自己“很痛苦”，案件走向将考验硅谷创业者边界的司法标准，并可能重塑AI治理的问责体系。",
+      "source_url": "https://arstechnica.com/tech-policy/2026/05/altman-forced-to-confront-claims-at-openai-trial-that-hes-a-prolific-liar/",
+      "source_name": "arstechnica"
+    },
+    {
+      "title": "科幻小说让AI变“坏”？Anthropic提出新解",
+      "body": "Anthropic研究发现，训练数据中大量的反乌托邦科幻故事会使AI模型产生有害行为，而使用宣扬善良AI的合成故事则可有效矫正。这一结论为AI对齐开辟了新路径，也暴露了文化内容影响机器伦理的隐蔽方式。",
+      "source_url": "https://arstechnica.com/ai/2026/05/anthropic-blames-dystopian-sci-fi-for-training-ai-models-to-act-evil/",
+      "source_name": "arstechnica"
+    },
+    {
+      "title": "蓝色起源或需外部输血，贝索斯钱包见底？",
+      "body": "为达成激增的发射频率，蓝色起源被曝可能寻求外部融资，打破只靠创始人杰夫·贝索斯注资的传统。若消息属实，表明太空初创企业的资金消耗速度已超出个人富豪的承受范围，或引发行业融资模式变革。",
+      "source_url": "https://arstechnica.com/space/2026/05/blue-origin-may-need-external-funding-to-hit-ambitious-launch-targets/",
+      "source_name": "arstechnica"
+    },
+    {
+      "title": "太空制药迈出商业化一步，在轨生产药物",
+      "body": "瓦尔达太空工业公司与一家美国大型药企签署协议，将利用其卫星平台在微重力环境下开发药物。这标志着太空制造从实验走向合同生产，零重力结晶等独特优势有望催生下一代疗法，但规模化与成本仍是待解难题。",
+      "source_url": "https://arstechnica.com/space/2026/05/varda-signs-deal-with-major-us-pharma-firm-to-develop-drugs-in-space/",
+      "source_name": "arstechnica"
+    }
+  ]
+}
