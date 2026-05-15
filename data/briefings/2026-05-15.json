@@ -1,0 +1,64 @@
+{
+  "items": [
+    {
+      "title": "俄罗斯施压大学生成为战时无人机飞行员",
+      "body": "俄罗斯大学正向学生施压，要求他们加入军方成为无人机飞行员。校方承诺无需上前线并可获得津贴等优待，试图将学术人员转化为战争技术资源。这一做法模糊了教育与军事的界限，引发对高校中立性及学生权益的担忧。俄罗斯在乌克兰战争中持续消耗无人机操作员，此举意在快速补充兵力，也暴露其无人机人才的紧缺。国际社会可能进一步审视俄罗斯的动员策略对教育体系的侵蚀。",
+      "source_url": "https://arstechnica.com/gadgets/2026/05/russia-pressures-university-students-to-become-wartime-drone-pilots/",
+      "source_name": "Ars Technica"
+    },
+    {
+      "title": "埃博拉疫情在刚果乌干达爆发，已致65人死亡",
+      "body": "刚果民主共和国与乌干达交界地区爆发罕见的埃博拉毒株疫情，已报告246例疑似病例，65人死亡。世界卫生组织于5月5日获悉潜在病例，而美国疾控中心在前一天才接到通知，信息滞后引发对国际预警机制的质疑。此次毒株并非此前常见类型，可能加大防控难度，地区冲突与医疗资源匮乏进一步加剧蔓延风险。",
+      "source_url": "https://arstechnica.com/health/2026/05/ebola-outbreak-confirmed-in-congo-and-uganda-246-suspected-cases-65-deaths/",
+      "source_name": "Ars Technica"
+    },
+    {
+      "title": "美中俄在地球静止轨道展开暗中监视博弈",
+      "body": "美国、中国和俄罗斯的卫星正密集活动于地球静止轨道（GEO），执行抵近侦察与监视任务。与深空隐藏不同，这些航天器在太空中极易被光学传感器捕捉，但三国仍不断向该轨道部署具备机动能力的卫星。这种看似透明的博弈实际将加剧太空军备竞赛，GEO正成为战略信息战的新高地。几乎没有国际规则约束此类行为，可能引发误判与冲突。",
+      "source_url": "https://arstechnica.com/space/2026/05/threes-a-party-us-china-and-now-russia-are-on-the-prowl-in-geo/",
+      "source_name": "Ars Technica"
+    },
+    {
+      "title": "煤污染每年吞噬大量太阳能发电潜力",
+      "body": "最新研究证实，煤炭燃烧排放的气溶胶会阻挡阳光，每年令全球太阳能电板少发大量电力。一地的煤电厂能通过大气传输削弱数百公里外光伏电站的出力，在亚洲煤电密集区尤为突出。这意味着发展太阳能需同步治污，否则清洁能源自己也会被化石燃料“掐住脖子”。",
+      "source_url": "https://arstechnica.com/science/2026/05/solar-power-production-undercut-by-coal-pollution/",
+      "source_name": "Ars Technica"
+    },
+    {
+      "title": "OpenAI 对苹果 ChatGPT 整合效果深感不满",
+      "body": "知情人士透露，OpenAI 高管私下对苹果设备上的 ChatGPT 整合功能感到“憋屈”，认为集成体验拙劣，远低于自身产品标准。法院在马斯克诉讼中要求苹果交出与 OpenAI 的秘密交易内部通讯，使这一不满浮出水面。搭载 ChatGPT 的苹果设备已上市数月，但功能受限且品牌露出不足，可能牵动两家估值最高公司间的微妙关系。",
+      "source_url": "https://arstechnica.com/tech-policy/2026/05/openai-feels-burned-by-apples-crappy-chatgpt-integration-insiders-say/",
+      "source_name": "Ars Technica"
+    },
+    {
+      "title": "新制程用钙硅酸盐岩替代石灰石，或消除水泥碳排放",
+      "body": "科学家提出用钙硅酸盐岩石完全替代石灰石生产波特兰水泥，理论上可将水泥制造这一高排放行业的二氧化碳释放降至零。传统石灰石分解会排出大量 CO2，而钙硅酸盐岩无需碳酸盐分解，避免了工艺排放。该路线若实现工业放大，将破除水泥降碳对碳捕集的依赖，但成本与资源分布仍是挑战。",
+      "source_url": "https://arstechnica.com/science/2026/05/running-the-numbers-on-a-zero-emission-way-to-make-cement/",
+      "source_name": "Ars Technica"
+    },
+    {
+      "title": "加州立法推进：游戏关服厂商须提供离线补丁或退款",
+      "body": "加利福尼亚州一项法案在关键委员会通过，要求游戏发行商在永久关闭在线服务器后，必须向消费者提供可独立运行的离线补丁或提供退款。若成法，将改变当前“停服即报废”的行业惯例，保护玩家购买内容的所有权。法案尚需州议会全院表决，游戏业游说力量预计将集中反扑。",
+      "source_url": "https://arstechnica.com/gaming/2026/05/bill-to-keep-online-games-playable-clears-key-hurdle-in-california/",
+      "source_name": "Ars Technica"
+    },
+    {
+      "title": "大众发布首款电动 GTI，但无缘美国市场",
+      "body": "大众汽车展示了 ID. Polo GTI，这是旗下标志性 GTI 品牌的首款纯电车型，设计致敬 1976 年经典高尔夫 GTI。新车专攻欧洲市场，大众明确表示不会引入北美。在欧洲车企加速电动化之际，美国市场却再次错过热门平价电动性能车，凸显不同排放法规与市场偏好下的产品割裂。",
+      "source_url": "https://arstechnica.com/cars/2026/05/how-the-other-half-lives-vw-shows-off-electric-polo-gti-for-europe/",
+      "source_name": "Ars Technica"
+    },
+    {
+      "title": "微软将 Xbox 品牌全面更名为全大写 XBOX",
+      "body": "微软正式将旗下游戏品牌 Xbox 改名为全大写的 XBOX，包括硬件、服务和营销标识。XBOX 首席执行官 Asha Sharma 在社交平台发起调查后推动该决策，认为新标识更具现代感和视觉冲击。这或许是消费电子史上最极致的品牌字母大小写变更，在争议声中试图刷新品牌形象，但原有玩家群体的习得情感能否接受尚不可知。",
+      "source_url": "https://www.theverge.com/news/931918/microsoft-xbox-rebrand-caps",
+      "source_name": "The Verge"
+    },
+    {
+      "title": "常规疫苗接种或显著降低痴呆风险",
+      "body": "大规模流行病学研究提示，破伤风、白喉、流感等常规疫苗可能使痴呆症发病率下降近三分之一。科学家提出一种假设：疫苗训练了曾被视作“不可驯化”的先天免疫系统，使其更有效地清除脑内淀粉样蛋白等病理产物。该发现若被验证，将赋予疫苗更大的公共卫生意义，也可能为阿尔茨海默病预防开辟新路径。",
+      "source_url": "https://arstechnica.com/health/2026/05/routine-vaccines-may-cut-dementia-risk-experts-have-startling-hypothesis-on-how/",
+      "source_name": "Ars Technica"
+    }
+  ]
+}
