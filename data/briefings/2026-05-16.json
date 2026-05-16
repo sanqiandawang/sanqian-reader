@@ -1,0 +1,52 @@
+{
+  "items": [
+    {
+      "title": "Snap、YouTube与TikTok和解首起校园伤害诉讼",
+      "body": "社交平台Snap、YouTube和TikTok就一项指控其产品导致学生沉迷并消耗公立学校大量资源的诉讼达成和解。该案为首开先例的集体诉讼，主张平台设计刻意诱导青少年过度使用，校方因此承担巨额心理辅导与纪律管理成本。和解条款未公开，但信号明确：社交媒体对教育系统的冲击已进入法律追责阶段，可能推动更严格的内容与年龄监管。",
+      "source_url": "https://www.theverge.com/tech/932153/snap-youtube-tiktok-lawsuit-social-media-addiction-schools",
+      "source_name": "The Verge"
+    },
+    {
+      "title": "美国CFTC押注AI侦测预测市场内幕交易",
+      "body": "美国商品期货交易委员会（CFTC）宣布将运用人工智能工具监控预测市场，以捕捉内幕交易等违法行为。随着政治博彩等新兴合约火爆，监管机构试图通过AI分析异常交易模式，提升执法效率。然而，预测市场信息混杂，如何界定“内幕”与合法信息优势仍是难题，此举可能引发对算法监管边界和隐私保护的广泛争议。",
+      "source_url": "https://arstechnica.com/tech-policy/2026/05/the-us-is-betting-on-ai-to-catch-insider-trading-in-prediction-markets/",
+      "source_name": "Ars Technica"
+    },
+    {
+      "title": "Nvidia开源26亿参数世界模型SANA-WM",
+      "body": "Nvidia研究团队发布开源世界模型SANA-WM，拥有2.6B参数，可根据文本生成最长一分钟的720p视频。该模型在时间连贯性和画质上表现卓越，训练数据规模庞大，直接对标闭源商业模型，有望降低长视频生成门槛，刺激创意工具与开发者社区创新，同时引发对深度伪造和版权的新一轮讨论。",
+      "source_url": "https://nvlabs.github.io/Sana/WM/",
+      "source_name": "NVLabs (via Hacker News)"
+    },
+    {
+      "title": "前沿AI突破CTF竞赛，安全攻防生态面临重塑",
+      "body": "随着大语言模型在破解密码、逆向工程等任务中碾压人类选手，传统信息安全夺旗赛（CTF）的规则正被改写。社区广泛观察到，AI解题速度与广度已超出个人能力极限，迫使赛事转向“人机协同”或纯AI赛道。这一趋势不仅挑战安全人才培养模式，更引发关键追问：当攻击方率先拥抱超人类智能，防御技术该如何演进？",
+      "source_url": "https://kabir.au/blog/the-ctf-scene-is-dead",
+      "source_name": "Kabir's Blog (via Hacker News)"
+    },
+    {
+      "title": "索尼澄清Xperia AI相机助手非后台监控",
+      "body": "索尼针对其Xperia 1 XIII手机AI Camera Assistant功能引发的隐私担忧发出详细解释，强调该工具仅在用户主动开启时提供构图建议，所有图像处理在设备本地完成，不会静默采集或上传数据。此前宣传物料被指暗示自动监视，索尼此次姿态意在重建信任，但也反映出手机AI功能普及中，透明沟通和技术保护同样关键。",
+      "source_url": "https://www.theverge.com/tech/932133/sony-xperia-1-xiii-ai-camera-assistant",
+      "source_name": "The Verge"
+    },
+    {
+      "title": "NPR主持人新书《Body Electric》审视技术对人体的慢性影响",
+      "body": "知名播客主播Manoush Zomorodi出版新书《Body Electric》，通过大量案例和科学研究，系统分析屏幕时间、社交媒体和即时通讯如何重塑人类注意力、睡眠周期及社交行为。该书并非简单地批判科技，而是提供身心修复框架，提醒读者在技术渗透率空前的时代，如何有意识地夺回对身体和时间的控制权。",
+      "source_url": "https://www.theverge.com/report/930171/manoush-zomorodi-body-electric-npr-questionnaire",
+      "source_name": "The Verge"
+    },
+    {
+      "title": "Turtle Beach发布Stealth Pro 2耳机，低价挑战SteelSeries",
+      "body": "Turtle Beach推出Stealth Pro 2无线游戏耳机，在主动降噪、双模连接和电池续航等核心规格上对标SteelSeries Arctis Nova Pro系列，但售价低50美元。初评认为其音质与做工接近高端竞品，差异在于品牌生态与软件细节。此举加剧中高端游戏音频市场竞争，印证外设领域特色功能下沉趋势。",
+      "source_url": "https://www.theverge.com/gadgets/930828/turtle-beach-stealth-pro-2-steelseries-arctis-nova-pro-omni-gaming-headset-hands-on",
+      "source_name": "The Verge"
+    },
+    {
+      "title": "REI周年促销启动，户外科技装备迎来年度低价",
+      "body": "美国最大户外用品零售商REI开启年度最大促销“Anniversary Sale”，涵盖智能手表、运动相机、GPS导航仪等科技装备，折扣力度达五折以上。活动被视为夏季户外季前的重要采购窗口，部分热门型号库存有限。此次大促恰好与消费电子整体促销季重叠，折射出户外科技产品从小众走向大众的趋势。",
+      "source_url": "https://www.theverge.com/gadgets/931274/rei-anniversary-sale-2026",
+      "source_name": "The Verge"
+    }
+  ]
+}
