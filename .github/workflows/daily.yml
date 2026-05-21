@@ -1,8 +1,9 @@
 name: Daily Pipeline
 
 on:
-  schedule:
-    - cron: "0 22 * * *"  # 6:00 CST
+  # 每日生成已暂停
+  # schedule:
+  #   - cron: "0 22 * * *"  # 6:00 CST
   workflow_dispatch:
 
 jobs:

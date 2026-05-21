@@ -23,12 +23,13 @@ services:
       - key: REFRESH_TOKEN
         sync: false
 
-  - type: cron
-    name: sanqian-pipeline
-    env: python
-    schedule: "0 22 * * *"
-    buildCommand: pip install -r requirements.txt
-    startCommand: curl -s "https://sanqian-reader.onrender.com/refresh?token=$REFRESH_TOKEN"
-    envVars:
-      - key: REFRESH_TOKEN
-        sync: false
+  # 每日生成已暂停
+  # - type: cron
+  #   name: sanqian-pipeline
+  #   env: python
+  #   schedule: "0 22 * * *"
+  #   buildCommand: pip install -r requirements.txt
+  #   startCommand: curl -s "https://sanqian-reader.onrender.com/refresh?token=$REFRESH_TOKEN"
+  #   envVars:
+  #     - key: REFRESH_TOKEN
+  #       sync: false
